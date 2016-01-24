@@ -13,7 +13,7 @@ Adapters (of which there can be 1), extends BaseAdapter and implements a few bas
 Middleware, are simple an intermediary you can write that every message goes through.  Each piece of middleware should return either a Left(MiddlewareFailure) if the message should be blocked or a Right(MiddlewareSuccess) if the message should be passed through.  On the first Left() the chain is halted 
 
 ### Listeners
-Listeners, can be one of two types Respond or Hear.  Hear, listens to every message in the chat, while Respond reacts when the bot is addressed by its name (configurable in appplication.conf).  A Listener is a simple class you right that takes a regex string in its constructor and a runCallback() method you need to implement which is what happens when the message matches your listener regex.  The Message object is passed to the callback and you can do as you please from there.
+Listeners, can be one of two types Respond or Hear.  Hear, listens to every message in the chat, while Respond reacts when the bot is addressed by its name (configurable in appplication.conf).  A Listener is a simple class you write that takes a regex string in its constructor and a runCallback() method you need to implement which is what happens when the message matches your listener regex.  The Message object is passed to the callback and you can do as you please from there.
 
 ### Getting started 
 
@@ -50,4 +50,43 @@ To create a middleware is similar to the listener.  Create a new class that exte
      }
      
     }
+    
+### Configuration
+
+2 configuration files should be used and placed in src/main/resources.  The first is application.conf (check the sample in this repo). The format is like so 
+
+    hubot {
+       name = "scalabot"
+
+      listeners = ["org.yourdomain.listeners.YourFirstListener",   "org.yourdomain.listeners.YourOtherListener"]
+
+      middleware = []
+
+      adapter = "org.dberg.hubot.adapter.ShellAdapter"
+}    
+
+The second is the logback.xml file.  Tweak this file depending on how you want your logging to work.
+
+    <configuration debug="true">
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+      <file>logs/hubot.log</file>
+
+      <encoder>
+        <pattern>%date %level [%file:%line] %msg%n</pattern>
+      </encoder>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+     <encoder>
+      <pattern>%date %level [%file:%line] %msg%n</pattern>
+     </encoder>
+    </appender>
+
+     <root level="DEBUG">
+      <appender-ref ref="FILE" />
+      <appender-ref ref="STDOUT" />
+     </root>
+    </configuration>
+
 

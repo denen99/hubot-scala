@@ -2,7 +2,7 @@ package org.dberg.hubot
 
 import com.typesafe.config.{ConfigFactory, Config}
 import com.typesafe.scalalogging.{StrictLogging, LazyLogging}
-import org.dberg.hubot.adapter.{TestAdapter, BaseAdapter}
+import org.dberg.hubot.adapter.{ShellAdapter, BaseAdapter}
 import org.dberg.hubot.models._
 import org.dberg.hubot.middleware._
 import org.dberg.hubot.utils.Helpers._
@@ -40,7 +40,7 @@ trait HubotBase {
   }
 
   def getAdapter : BaseAdapter = {
-    val adapter = getConfString("hubot.adapter","org.dberg.hubot.adapter.TestAdapter")
+    val adapter = getConfString("hubot.adapter","org.dberg.hubot.adapter.ShellAdapter")
     Class.forName(adapter).newInstance().asInstanceOf[BaseAdapter]
   }
 

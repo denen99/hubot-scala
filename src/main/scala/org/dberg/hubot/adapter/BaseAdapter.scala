@@ -19,7 +19,7 @@ abstract class BaseAdapter {
 }
 
 
-class TestAdapter extends BaseAdapter {
+class ShellAdapter extends BaseAdapter {
 
   def send(message: Message) =
     println(message.body)
