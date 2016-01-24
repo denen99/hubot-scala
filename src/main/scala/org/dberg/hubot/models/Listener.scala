@@ -14,7 +14,7 @@ object ListenerType {
 }
 
 
-abstract class Listener(matcher: String, listenerType: ListenerValue = ListenerType.Respond, option: Map[String,String] = Map())  {
+abstract class Listener(matcher: String, listenerType: ListenerValue = ListenerType.Respond)  {
 
   def call(message: Message): Unit = {
     if ( shouldRespond(message) ) {
@@ -36,7 +36,7 @@ abstract class Listener(matcher: String, listenerType: ListenerValue = ListenerT
 }
 
 
-case class TestListener() extends Listener("listen1") {
+case class TestListener() extends Listener("listen1\\s+") {
 
   def runCallback(message: Message) = {
     Logger.log("Running callback for listner TestListener","debug")

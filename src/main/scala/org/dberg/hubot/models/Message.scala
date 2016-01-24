@@ -3,7 +3,7 @@ package org.dberg.hubot.models
 import org.dberg.hubot.Hubot
 
 
-abstract class MessageBase(user: User, body: String, done: Boolean = false ) {
+abstract class MessageBase(user: User, body: String, params: Map[String,String] = Map() ) {
   val room = user.room
 
   def respondTo = {
@@ -11,6 +11,4 @@ abstract class MessageBase(user: User, body: String, done: Boolean = false ) {
   }
 }
 
-case class Message(user: User,  body: String, done: Boolean = false ) extends MessageBase(user,body)
-
-case class TextMessage(user: User, body: String, id: Int) extends MessageBase(user,body)
+case class Message(user: User,  body: String, params: Map[String,String] = Map(), done: Boolean = false ) extends MessageBase(user,body)
