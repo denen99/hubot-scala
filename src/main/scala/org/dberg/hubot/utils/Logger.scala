@@ -1,8 +1,8 @@
-package org.dberg.hubot.logger
+package org.dberg.hubot.utils
 
-import com.typesafe.scalalogging.StrictLogging
+import com.typesafe.scalalogging.{StrictLogging}
 
-object Logger extends StrictLogging{
+object Logger extends StrictLogging {
 
   def log(msg: String, level: String = "debug") = level match {
     case "info" => logger.info(msg)

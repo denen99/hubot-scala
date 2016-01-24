@@ -2,15 +2,14 @@ package org.dberg.hubot.models
 
 import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.adapter.BaseAdapter
-import org.dberg.hubot.logger.Logger
+import org.dberg.hubot.utils.Logger
 import org.dberg.hubot.middleware.{MiddlewareSuccess, MiddlewareError, Middleware}
 import org.slf4j.impl.StaticLoggerBinder
 
 class Robot(adapter: BaseAdapter,
             val listeners: Seq[Listener],
             val middleware: Seq[Middleware],
-            name: String = "Hubot",
-            alias: Boolean = false
+            val name: String
                  )  {
 
   def processMiddlewareRec(message: Message,
