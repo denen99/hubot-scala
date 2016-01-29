@@ -19,7 +19,7 @@ Listeners, can be one of two types Respond or Hear.  Hear, listens to every mess
 
 To get started, first, you need to put the hubot-scala library in your build.sbt as follows
 
-        libraryDependencies += "org.dberg" % "hubot-scala_2.11" % "0.0.2"
+        libraryDependencies += "org.dberg" % "hubot-scala_2.11" % "0.0.3"
         
         
 Once you do that, in your new project create whatever classes you need.  For example, here is a simple listener, that responds to hello when the Bot is addressed
