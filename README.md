@@ -90,3 +90,13 @@ The second is the logback.xml file.  Tweak this file depending on how you want y
     </configuration>
 
 
+### Running the Bot 
+
+ Once you have everything configured you simply need to start the bot.  Simple Main class as so 
+ 
+     object Main {
+      def main(args: Array[String]) = {
+         Hubot.robot.run()
+      }
+     }
+
