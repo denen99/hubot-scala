@@ -76,8 +76,8 @@ class HipchatAdapter extends BaseAdapter {
 
   }
 
-  val jid = getConfString("hubot.jid","none")
-  val password = getConfString("hubot.password","none")
+  val jid = getConfString("hipchat.jid","none")
+  val password = getConfString("hipchat.password","none")
 
   val verify = new HostnameVerifier {
     override def verify(s: String, sslSession: SSLSession): Boolean = true
