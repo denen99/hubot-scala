@@ -1,10 +1,10 @@
 package org.dberg.hubot.models
 
-class User private(val id: Int,  val room: String, val dict: Map[String,String] = Map())
+class User private(val room: String, val id: Int = 1 , val dict: Map[String,String] = Map())
 
 object User {
-  def apply(id: Int, room: String, dict: Map[String,String] = Map()) =
-    new User(id, room, dict + ("name" -> id.toString))
+  def apply(room: String, id: Int = 1, dict: Map[String,String] = Map()) =
+    new User(room, id, dict + ("name" -> id.toString))
 }
 
 
