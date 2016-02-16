@@ -1,0 +1,14 @@
+hubot {
+  name = "scalabot"
+
+  listeners = ["org.dberg.hubot.models.TestListener", "org.dberg.hubot.models.TestListener2"]
+
+  middleware = []
+
+  adapter = "org.dberg.hubot.adapter.HipchatAdapter"
+}
+
+hipchat {
+  jid="111@chat.hipchat.com"
+  password="somePass"
+}
