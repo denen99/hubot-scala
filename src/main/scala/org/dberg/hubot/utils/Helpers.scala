@@ -13,7 +13,7 @@ object Helpers {
     val regexStr = s"(?i)^[@]?${Hubot.robot.name}\\s*"
 
     def addressedToHubot: Boolean =
-      regex.findFirstIn(body).isDefined
+       regex.findFirstIn(body).isDefined
 
     def removeBotString: String =
       body.replaceFirst(regexStr,"")
@@ -23,8 +23,8 @@ object Helpers {
   val config = ConfigFactory.load()
 
   def getConfString(key: String, default: String): String = config.hasPath(key) match {
-    case false => Logger.log("Sending back default hubot name of " + default, "debug"); default
-    case true => Logger.log("Returning from config "); config.getString(key)
+    case false =>  default
+    case true => config.getString(key)
   }
 
   def getConfStringList(key: String): Seq[String] = config.hasPath(key) match {

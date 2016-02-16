@@ -39,8 +39,9 @@ abstract class Listener(matcher: String, listenerType: ListenerValue = ListenerT
 case class TestListener() extends Listener("listen1\\s+") {
 
   def runCallback(message: Message) = {
-    Logger.log("Running callback for listner TestListener","debug")
-    Hubot.robot.send(Message(message.user,"listen1 heard " + message.body))
+    val resp = "listen1 heard " + message.body
+    Logger.log("Running callback for listner TestListener, sending response " + resp,"debug")
+    Hubot.robot.send(Message(message.user,resp))
   }
 
   val helpString = Some("listen1 -> Responds to anything and repeats it ")

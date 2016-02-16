@@ -29,7 +29,7 @@ class ShellAdapter extends BaseAdapter {
     while(true) {
       print(Hubot.robot.name + " >")
       val resp = scala.io.StdIn.readLine()
-      Hubot.robot.receive(Message(User(1,"adam"),resp))
+      Hubot.robot.receive(Message(User("adam"),resp))
     }
   }
 }
