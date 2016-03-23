@@ -16,9 +16,10 @@ object ListenerType {
 
 abstract class Listener(matcher: String, listenerType: ListenerValue = ListenerType.Respond)  {
 
+  val pattern = matcher.r
+
   def call(message: Message): Unit = {
     if ( shouldRespond(message) ) {
-      val pattern = matcher.r
       pattern.findFirstIn(message.body.removeBotString) match {
         case None => Logger.log("no match for listner " + this.getClass.getName)
         case Some(x) => runCallback(message.copy(body = message.body.removeBotString))
@@ -36,6 +37,9 @@ abstract class Listener(matcher: String, listenerType: ListenerValue = ListenerT
 }
 
 
+//-------------------------------------
+// SOME TEST LISTENERS FOR NOW
+//-------------------------------------
 case class TestListener() extends Listener("listen1\\s+") {
 
   def runCallback(message: Message) = {
