@@ -2,7 +2,7 @@ lazy val root = (project in file(".")).
   settings(
     name := "hubot-scala",
     version := "0.0.3",
-    scalaVersion := "2.11.7",
+    scalaVersion := "2.11.8",
     retrieveManaged := true,
     libraryDependencies += "com.typesafe" % "config" % "1.3.0",
     libraryDependencies += "org.specs2" %% "specs2-core" % "3.7" % "test",
