@@ -27,11 +27,14 @@ class Robot(adapter: BaseAdapter,
   }
 
   def receive(message: Message) = {
+    println(message)
     //Loop through middleware, halting if need be
     //then send to each listener
     processMiddleware(message) match {
       case Left(x) => println("Sorry error " + x.error)
-      case Right(x) => processListeners(message)
+      case Right(x) =>
+        println(message)
+        processListeners(message)
     }
   }
 
