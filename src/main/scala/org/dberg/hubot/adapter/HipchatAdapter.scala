@@ -10,17 +10,14 @@ import org.jivesoftware.smack.chat.{ChatManagerListener, ChatManager, Chat, Chat
 import org.jivesoftware.smack.tcp.{XMPPTCPConnection, XMPPTCPConnectionConfiguration}
 import org.dberg.hubot.models.{User, Message}
 import org.dberg.hubot.utils.Helpers._
+import org.dberg.hubot.models.{Message => HubotMessage}
+import org.jivesoftware.smack.packet.{Message => SmackMessage}
 
-
-class HipchatAdapter extends BaseAdapter {
-
+object HipchatAdapter {
   val regex = "(^[^/]+)"
   val pattern = Pattern.compile(regex)
 
-  type HubotMessage = org.dberg.hubot.models.Message
-  type SmackMessage = org.jivesoftware.smack.packet.Message
-
-  class chatListener extends ChatMessageListener {
+  class ChatListener extends ChatMessageListener {
 
     def getJid(from: String): String = {
       val matcher = pattern.matcher(from)
@@ -39,8 +36,7 @@ class HipchatAdapter extends BaseAdapter {
     }
   }
 
-
-  class connectListener extends ConnectionListener {
+  class ConnectListener(conn: XMPPTCPConnection)(onClose: () => Unit) extends ConnectionListener {
     def connected(connection: XMPPConnection) =
       Logger.log("Received connection from user : " + connection.getUser,"debug")
 
@@ -55,9 +51,9 @@ class HipchatAdapter extends BaseAdapter {
 
     def connectionClosedOnError(e: Exception) = {
       Logger.log("Connection closed : " + e.getMessage + ", attempting to re-connect","info")
-      conn.removeConnectionListener(connectListener)
+      conn.removeConnectionListener(this)
       conn.disconnect()
-      run()
+      onClose()
     }
 
     def connectionClosed =
@@ -67,13 +63,37 @@ class HipchatAdapter extends BaseAdapter {
      Logger.log("Reconnecting in " + seconds.toString + " seconds","debug")
   }
 
-  class chatMgrListener extends ChatManagerListener {
+  class ChatMgrListener extends ChatManagerListener {
     def chatCreated(chat: Chat, createdLocally: Boolean) = {
       if (!createdLocally) {
-        chat.addMessageListener(new chatListener)
+        chat.addMessageListener(new ChatListener)
       }
     }
+  }
 
+}
+
+class HipchatAdapter extends BaseAdapter {
+  import HipchatAdapter._
+
+  def run() = {
+    conn.addConnectionListener(connectListener)
+    if (!conn.isConnected)
+      conn.connect()
+    if (!conn.isAuthenticated)
+      conn.login()
+    if (conn.isAuthenticated) {
+      while (conn.isAuthenticated) {
+         // do nothing
+      }
+      Logger.log("Error - disconnected from server, reconnecting","error")
+      run()
+    }
+  }
+
+  def send(message: HubotMessage) = {
+    val chat = chatMgr.createChat(message.user.room, new ChatListener)
+    chat.sendMessage(message.body)
   }
 
   val jid = getConfString("hipchat.jid","none")
@@ -94,29 +114,8 @@ class HipchatAdapter extends BaseAdapter {
 
   val conn = new XMPPTCPConnection(conf.build())
   val chatMgr = ChatManager.getInstanceFor(conn)
-  val connectListener = new connectListener
-  chatMgr.addChatListener(new chatMgrListener)
-
-  def run() = {
-
-    conn.addConnectionListener(connectListener)
-    if (!conn.isConnected)
-      conn.connect()
-    if (!conn.isAuthenticated)
-      conn.login()
-    if (conn.isAuthenticated) {
-      while (conn.isAuthenticated) {
-         // do nothing
-      }
-      Logger.log("Error - disconnected from server, reconnecting","error")
-      run()
-    }
-  }
-
-  def send(message: HubotMessage) = {
-    val chat = chatMgr.createChat(message.user.room, new chatListener)
-    chat.sendMessage(message.body)
-  }
+  val connectListener = new ConnectListener(conn)(run)
+  chatMgr.addChatListener(new ChatMgrListener)
 
 
 }

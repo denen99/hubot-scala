@@ -4,18 +4,20 @@ lazy val root = (project in file(".")).
     version := "0.0.3",
     scalaVersion := "2.11.8",
     retrieveManaged := true,
-    libraryDependencies += "com.typesafe" % "config" % "1.3.0",
-    libraryDependencies += "org.specs2" %% "specs2-core" % "3.7" % "test",
-    libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
-    libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.1",
-    libraryDependencies += "org.slf4j" % "log4j-over-slf4j" % "1.7.1",  // for any java classes looking for this
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.3" ,
-    libraryDependencies += "org.igniterealtime.smack" % "smack-core" % "4.1.6",
-    libraryDependencies += "org.igniterealtime.smack" % "smack-tcp" % "4.1.6",
-    libraryDependencies += "org.igniterealtime.smack" % "smackx" % "3.2.1",
-    libraryDependencies += "org.igniterealtime.smack" % "smack-im" % "4.1.6",
-    libraryDependencies += "org.igniterealtime.smack" % "smack-sasl-provided" % "4.1.6",
-    libraryDependencies += "org.igniterealtime.smack" % "smack-java7" % "4.1.6"
+    libraryDependencies ++= Seq(
+      "com.typesafe" % "config" % "1.3.0",
+      "org.specs2" %% "specs2-core" % "3.7" % "test",
+      "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
+      "org.slf4j" % "slf4j-api" % "1.7.22",
+      "org.slf4j" % "log4j-over-slf4j" % "1.7.22",  // for any java classes looking for this
+      "ch.qos.logback" % "logback-classic" % "1.1.9" ,
+      "org.igniterealtime.smack" % "smack-core" % "4.1.6",
+      "org.igniterealtime.smack" % "smack-tcp" % "4.1.6",
+      "org.igniterealtime.smack" % "smackx" % "3.2.1",
+      "org.igniterealtime.smack" % "smack-im" % "4.1.6",
+      "org.igniterealtime.smack" % "smack-sasl-provided" % "4.1.6",
+      "org.igniterealtime.smack" % "smack-java7" % "4.1.6"
+    )
 )
 
 organization := "org.dberg"

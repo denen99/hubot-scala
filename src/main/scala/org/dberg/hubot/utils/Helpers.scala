@@ -8,16 +8,16 @@ import scala.collection.JavaConversions._
 
 object Helpers {
 
-  val regex: Regex = s"(?i)^[@]?${Hubot.robot.name}".r
-  val regexStr = s"(?i)^[@]?${Hubot.robot.name}\\s*"
+  def regex(name: String): Regex = s"(?i)^[@]?$name".r
+  def regexStr(name: String) = s"(?i)^[@]?$name\\s*"
 
-  implicit class robotMatcher(body: String) {
+  implicit class RobotMatcher(body: String) {
 
-    def addressedToHubot: Boolean =
-       regex.findFirstIn(body).isDefined
+    def addressedToHubot(name: String): Boolean =
+       regex(name).findFirstIn(body).isDefined
 
-    def removeBotString: String =
-      body.replaceFirst(regexStr,"")
+    def removeBotString(name: String): String =
+      body.replaceFirst(regexStr(name), "")
 
   }
 

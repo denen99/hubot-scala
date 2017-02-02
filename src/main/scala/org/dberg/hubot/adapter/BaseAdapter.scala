@@ -7,7 +7,6 @@ import org.dberg.hubot.utils.Logger
 
 abstract class BaseAdapter {
 
-
   def send(message: Message): Unit
 
   def run(): Unit
@@ -28,8 +27,12 @@ class ShellAdapter extends BaseAdapter {
     Logger.log("Running adapter " + this.getClass.getName,"info")
     while(true) {
       print(Hubot.robot.name + " >")
-      val resp = scala.io.StdIn.readLine()
+      Option(scala.io.StdIn.readLine())
+        .map(_.trim)
+        .filter(_.nonEmpty)
+        .foreach { resp =>
       Hubot.robot.receive(Message(User("adam"),resp))
+      }
     }
   }
 }
