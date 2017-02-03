@@ -15,12 +15,12 @@ object ListenerType {
 
 
 abstract class Listener(
-  robotName: String,
   matcher: String,
   listenerType: ListenerValue = ListenerType.Respond
 )  {
 
   val pattern = matcher.r
+  val robotName = Robot.hubotName
 
   def call(message: Message): Unit = {
     if (shouldRespond(message) ) {
@@ -47,7 +47,7 @@ abstract class Listener(
 //-------------------------------------
 // SOME TEST LISTENERS FOR NOW
 //-------------------------------------
-case class TestListener(robotName: String) extends Listener(robotName, "listen1\\s+") {
+case class TestListener() extends Listener("listen1\\s+") {
 
   def runCallback(message: Message) = {
     val resp = "listen1 heard " + message.body
@@ -58,7 +58,7 @@ case class TestListener(robotName: String) extends Listener(robotName, "listen1\
   val helpString = Some("listen1 -> Responds to anything and repeats it ")
 }
 
-case class TestListener2(robotName: String) extends Listener(robotName, "listen2") {
+case class TestListener2() extends Listener("listen2") {
 
   def runCallback(message: Message) = {
     Logger.log("Running callback for listner TestListener2","debug")
@@ -69,7 +69,7 @@ case class TestListener2(robotName: String) extends Listener(robotName, "listen2
 
 }
 
-case class HelpListener(robotName: String, helpCommands: Seq[String]) extends Listener(robotName, "^help") {
+case class HelpListener(helpCommands: Seq[String]) extends Listener("^help") {
 
   def runCallback(message: Message) = {
     Logger.log("Running help listener","debug")
