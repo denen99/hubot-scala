@@ -15,22 +15,23 @@ object ListenerType {
 
 
 abstract class Listener(
-  robotName: String,
   matcher: String,
   listenerType: ListenerValue = ListenerType.Respond
 )  {
 
   val pattern = matcher.r
+  val robotName = Robot.hubotName
 
-  def call(robot: Robot, message: Message): Unit = {
+  def call(message: Message): Unit = {
     if (shouldRespond(message) ) {
       pattern.findFirstIn(message.body.removeBotString(robotName)) match {
         case None => Logger.log("no match for listner " + this.getClass.getName)
-        case Some(x) => runCallback(robot, message.copy(
+        case Some(x) => runCallback(message.copy(
           body = message.body.removeBotString(robotName)
         ))
       }
     }
+    else { Logger.log("Sorry, listeners says we should not respond")}
   }
 
   def shouldRespond(message: Message): Boolean = {
@@ -38,7 +39,7 @@ abstract class Listener(
     listenerType == ListenerType.Hear || (listenerType ==  ListenerType.Respond && message.body.addressedToHubot(robotName))
   }
 
-  def runCallback(robot: Robot, message: Message): Unit
+  def runCallback(message: Message): Unit
 
   def helpString: Option[String]
 }
@@ -47,33 +48,33 @@ abstract class Listener(
 //-------------------------------------
 // SOME TEST LISTENERS FOR NOW
 //-------------------------------------
-case class TestListener(robotName: String) extends Listener(robotName, "listen1\\s+") {
+case class TestListener() extends Listener("listen1\\s+", ListenerType.Hear) {
 
-  def runCallback(robot: Robot, message: Message) = {
+  def runCallback(message: Message) = {
     val resp = "listen1 heard " + message.body
     Logger.log("Running callback for listner TestListener, sending response " + resp,"debug")
-    robot.send(Message(message.user,resp))
+    Robot.send(Message(message.user,resp))
   }
 
   val helpString = Some("listen1 -> Responds to anything and repeats it ")
 }
 
-case class TestListener2(robotName: String) extends Listener(robotName, "listen2") {
+case class TestListener2() extends Listener("listen2") {
 
-  def runCallback(robot: Robot, message: Message) = {
+  def runCallback(message: Message) = {
     Logger.log("Running callback for listner TestListener2","debug")
-    robot.send(Message(message.user,message.body.reverse))
+    Robot.send(Message(message.user,message.body.reverse))
   }
 
   val helpString = Some("listen2 -> reverses anything you send it ")
 
 }
 
-case class HelpListener(robotName: String, helpCommands: Seq[String]) extends Listener(robotName, "^help") {
+case class HelpListener(helpCommands: Seq[String]) extends Listener("^help") {
 
-  def runCallback(robot: Robot, message: Message) = {
+  def runCallback(message: Message) = {
     Logger.log("Running help listener","debug")
-    robot.send(Message(message.user,"Help commands \n" + helpCommands.mkString("\n")))
+    Robot.send(Message(message.user,"Help commands \n" + helpCommands.mkString("\n")))
   }
 
   val helpString = Some("help -> list all available commands ")

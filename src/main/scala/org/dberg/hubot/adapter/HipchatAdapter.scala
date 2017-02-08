@@ -1,16 +1,15 @@
 package org.dberg.hubot.adapter
 
 import java.util.regex.Pattern
-import javax.net.ssl.{SSLSession, HostnameVerifier}
+import javax.net.ssl.{HostnameVerifier, SSLSession}
 
 import org.dberg.hubot.Hubot
 import org.dberg.hubot.utils.Logger
-import org.jivesoftware.smack.{XMPPConnection, ConnectionListener, ConnectionConfiguration}
-import org.jivesoftware.smack.chat.{ChatManagerListener, ChatManager, Chat, ChatMessageListener}
+import org.jivesoftware.smack.{ConnectionConfiguration, ConnectionListener, XMPPConnection}
+import org.jivesoftware.smack.chat.{Chat, ChatManager, ChatManagerListener, ChatMessageListener}
 import org.jivesoftware.smack.tcp.{XMPPTCPConnection, XMPPTCPConnectionConfiguration}
-import org.dberg.hubot.models.{User, Message}
+import org.dberg.hubot.models.{Message => HubotMessage, Robot, User}
 import org.dberg.hubot.utils.Helpers._
-import org.dberg.hubot.models.{Message => HubotMessage}
 import org.jivesoftware.smack.packet.{Message => SmackMessage}
 
 object HipchatAdapter {
@@ -31,7 +30,7 @@ object HipchatAdapter {
       if (msg.getBody != null) {
         val jid = getJid(msg.getFrom)
         val user = User(jid)
-        Hubot.robot.receive(Message(user, msg.getBody))
+        Robot.receive(HubotMessage(user, msg.getBody))
       }
     }
   }
@@ -74,6 +73,7 @@ object HipchatAdapter {
 }
 
 class HipchatAdapter extends BaseAdapter {
+
   import HipchatAdapter._
 
   def run() = {

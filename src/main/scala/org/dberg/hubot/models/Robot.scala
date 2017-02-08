@@ -3,16 +3,35 @@ package org.dberg.hubot.models
 import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.adapter.BaseAdapter
 import org.dberg.hubot.utils.Logger
-import org.dberg.hubot.middleware.{MiddlewareSuccess, MiddlewareError, Middleware}
+import org.dberg.hubot.middleware.{Middleware, MiddlewareError, MiddlewareSuccess}
+import org.dberg.hubot.utils.Helpers.{getConfString, getConfStringList}
 import org.slf4j.impl.StaticLoggerBinder
 
-class Robot(adapter: BaseAdapter,
-            val listeners: Seq[Listener],
-            val middleware: Seq[Middleware],
-            val name: String
-                 )  {
+object Robot {
 
-  def processMiddlewareRec(message: Message,
+
+  val hubotName = getConfString("hubot.name","hubot")
+
+  val adapter: BaseAdapter = {
+    val adapter = getConfString("hubot.adapter","org.dberg.hubot.adapter.ShellAdapter")
+    Class.forName(adapter).newInstance().asInstanceOf[BaseAdapter]
+  }
+
+  val middleware = {
+    getConfStringList("hubot.middleware").map { m =>
+      Logger.log("Registering new middleware " + m,"info")
+      Class.forName(m).newInstance().asInstanceOf[Middleware]
+    }
+  }
+
+  val listeners: Seq[Listener] = {
+    getConfStringList("hubot.listeners").map { l =>
+      Logger.log("Registering listener " + l,"info")
+      Class.forName(l).newInstance().asInstanceOf[Listener]
+    }
+  }
+
+  private def processMiddlewareRec(message: Message,
                            m: Seq[Middleware],
                            prevResult: Either[MiddlewareError,MiddlewareSuccess] = Right(MiddlewareSuccess())): Either[MiddlewareError,MiddlewareSuccess] = m match {
     case Nil => prevResult
@@ -20,20 +39,21 @@ class Robot(adapter: BaseAdapter,
     case _ =>  prevResult
   }
 
+
   def processMiddleware(message: Message) = processMiddlewareRec(message: Message, middleware)
 
   def processListeners( message: Message) = {
-    listeners.foreach { l => l.call(message) }
+    listeners.foreach { l => Logger.log("Processing message through listener " + l.toString);   l.call(message) }
   }
 
   def receive(message: Message) = {
-    println(message)
+    Logger.log("Received message " + message)
     //Loop through middleware, halting if need be
     //then send to each listener
     processMiddleware(message) match {
-      case Left(x) => println("Sorry error " + x.error)
+      case Left(x) => Logger.log("Sorry, middleware error " + x.error)
       case Right(x) =>
-        println(message)
+        Logger.log("Middleware passed")
         processListeners(message)
     }
   }
