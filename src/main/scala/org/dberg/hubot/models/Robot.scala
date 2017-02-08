@@ -43,17 +43,17 @@ object Robot {
   def processMiddleware(message: Message) = processMiddlewareRec(message: Message, middleware)
 
   def processListeners( message: Message) = {
-    listeners.foreach { l => l.call(message) }
+    listeners.foreach { l => Logger.log("Processing message through listener " + l.toString);   l.call(message) }
   }
 
   def receive(message: Message) = {
-    println(message)
+    Logger.log("Received message " + message)
     //Loop through middleware, halting if need be
     //then send to each listener
     processMiddleware(message) match {
-      case Left(x) => println("Sorry error " + x.error)
+      case Left(x) => Logger.log("Sorry, middleware error " + x.error)
       case Right(x) =>
-        println(message)
+        Logger.log("Middleware passed")
         processListeners(message)
     }
   }

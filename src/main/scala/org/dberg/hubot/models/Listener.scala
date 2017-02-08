@@ -31,6 +31,7 @@ abstract class Listener(
         ))
       }
     }
+    else { Logger.log("Sorry, listeners says we should not respond")}
   }
 
   def shouldRespond(message: Message): Boolean = {
@@ -47,7 +48,7 @@ abstract class Listener(
 //-------------------------------------
 // SOME TEST LISTENERS FOR NOW
 //-------------------------------------
-case class TestListener() extends Listener("listen1\\s+") {
+case class TestListener() extends Listener("listen1\\s+", ListenerType.Hear) {
 
   def runCallback(message: Message) = {
     val resp = "listen1 heard " + message.body
