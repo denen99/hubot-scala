@@ -5,9 +5,10 @@ import org.dberg.hubot.Hubot
 
 abstract class MessageBase(user: User, body: String,  params: Map[String,String] = Map()) {
   val room = user.room
+  val robot = Robot.robotService
 
   def respondTo = {
-    val regex = s"""^${Robot.hubotName}"""
+    val regex = s"""^${robot.hubotName}"""
   }
 }
 

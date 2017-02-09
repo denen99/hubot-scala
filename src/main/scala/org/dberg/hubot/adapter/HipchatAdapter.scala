@@ -15,6 +15,7 @@ import org.jivesoftware.smack.packet.{Message => SmackMessage}
 object HipchatAdapter {
   val regex = "(^[^/]+)"
   val pattern = Pattern.compile(regex)
+  val robot = Robot.robotService
 
   class ChatListener extends ChatMessageListener {
 
@@ -30,7 +31,7 @@ object HipchatAdapter {
       if (msg.getBody != null) {
         val jid = getJid(msg.getFrom)
         val user = User(jid)
-        Robot.receive(HubotMessage(user, msg.getBody))
+        robot.receive(HubotMessage(user, msg.getBody))
       }
     }
   }
