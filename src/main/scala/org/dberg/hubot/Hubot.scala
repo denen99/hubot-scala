@@ -14,9 +14,9 @@ object Hubot {
     val config = ConfigFactory.load()
     val hubotName = getConfString("hubot.name","hubot")
     val robot = Robot.robotService
-    Logger.log("Found listeners " + robot.listeners)
-    Logger.log("Found middleware " + robot.middleware)
-    Logger.log("Using adapter " + robot.adapter)
+    Logger.log("Found listeners " + Robot.listeners)
+    Logger.log("Found middleware " + Robot.middleware)
+    Logger.log("Using adapter " + Robot.adapter)
     robot.run()
 
   }

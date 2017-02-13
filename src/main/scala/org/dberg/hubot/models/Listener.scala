@@ -6,7 +6,7 @@ import org.dberg.hubot.Hubot
 import org.dberg.hubot.utils.Logger
 import org.dberg.hubot.models.ListenerType.ListenerValue
 import org.dberg.hubot.utils.Helpers._
-import org.dberg.hubot.models.Robot.{robotService => robot}
+import org.dberg.hubot.models.Robot.RobotService
 
 object ListenerType {
   sealed trait ListenerValue
@@ -16,6 +16,7 @@ object ListenerType {
 
 
 abstract class Listener(
+  robot: RobotService,
   matcher: String,
   listenerType: ListenerValue = ListenerType.Respond
 )  {
@@ -50,7 +51,7 @@ abstract class Listener(
 //-------------------------------------
 // SOME TEST LISTENERS FOR NOW
 //-------------------------------------
-case class TestListener() extends Listener("listen1\\s+", ListenerType.Hear) {
+class TestListener(robot: RobotService) extends Listener(robot, "listen1\\s+", ListenerType.Hear) {
 
   def runCallback(message: Message) = {
     val resp = "listen1 heard " + message.body
@@ -61,7 +62,7 @@ case class TestListener() extends Listener("listen1\\s+", ListenerType.Hear) {
   val helpString = Some("listen1 -> Responds to anything and repeats it ")
 }
 
-case class TestListener2() extends Listener("listen2") {
+class TestListener2(robot: RobotService) extends Listener(robot,"listen2") {
 
   def runCallback(message: Message) = {
     Logger.log("Running callback for listner TestListener2","debug")
@@ -72,7 +73,9 @@ case class TestListener2() extends Listener("listen2") {
 
 }
 
-case class HelpListener(helpCommands: Seq[String]) extends Listener("^help") {
+class HelpListener(robot: RobotService) extends Listener(robot,"^help") {
+
+  val helpCommands = Seq("help", "help2")
 
   def runCallback(message: Message) = {
     Logger.log("Running help listener","debug")

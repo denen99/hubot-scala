@@ -8,9 +8,10 @@ import org.dberg.hubot.utils.Logger
 import org.jivesoftware.smack.{ConnectionConfiguration, ConnectionListener, XMPPConnection}
 import org.jivesoftware.smack.chat.{Chat, ChatManager, ChatManagerListener, ChatMessageListener}
 import org.jivesoftware.smack.tcp.{XMPPTCPConnection, XMPPTCPConnectionConfiguration}
-import org.dberg.hubot.models.{Message => HubotMessage, Robot, User}
+import org.dberg.hubot.models.{Robot, User, Message => HubotMessage}
 import org.dberg.hubot.utils.Helpers._
 import org.jivesoftware.smack.packet.{Message => SmackMessage}
+import org.dberg.hubot.models.Robot.RobotService
 
 object HipchatAdapter {
   val regex = "(^[^/]+)"
@@ -28,6 +29,8 @@ object HipchatAdapter {
     }
 
     def processMessage(chat: Chat, msg: SmackMessage) = {
+      Logger.log("chat: " + chat.toString)
+      Logger.log("msg: " + msg.toString)
       if (msg.getBody != null) {
         val jid = getJid(msg.getFrom)
         val user = User(jid)
@@ -73,7 +76,7 @@ object HipchatAdapter {
 
 }
 
-class HipchatAdapter extends BaseAdapter {
+class HipchatAdapter(robot: RobotService) extends BaseAdapter(robot: RobotService) {
 
   import HipchatAdapter._
 

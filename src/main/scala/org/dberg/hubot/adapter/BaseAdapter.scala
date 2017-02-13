@@ -1,13 +1,12 @@
 package org.dberg.hubot.adapter
 
-import com.typesafe.scalalogging.{StrictLogging, LazyLogging}
+import com.typesafe.scalalogging.{LazyLogging, StrictLogging}
 import org.dberg.hubot.Hubot
-import org.dberg.hubot.models.{User, Message, Robot}
+import org.dberg.hubot.models.{Message, Robot, User}
+import org.dberg.hubot.models.Robot.RobotService
 import org.dberg.hubot.utils.Logger
 
-abstract class BaseAdapter {
-
-  val robot = Robot.robotService
+abstract class BaseAdapter(robot: RobotService) {
 
   def send(message: Message): Unit
 
@@ -20,7 +19,7 @@ abstract class BaseAdapter {
 }
 
 
-class ShellAdapter extends BaseAdapter {
+case class ShellAdapter(robot: RobotService) extends BaseAdapter(robot: RobotService) {
 
   def send(message: Message) =
     println(message.body)
