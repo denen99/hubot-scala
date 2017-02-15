@@ -73,7 +73,7 @@ object Robot extends RobotComponent {
       case x => Logger.log("Sorry, uknown middleware in config " + x,"debug")
     }).asInstanceOf[Seq[Middleware]]
   }
-  
+
   private def processMiddlewareRec(message: Message,
                                    m: Seq[Middleware],
                                    prevResult: Either[MiddlewareError,MiddlewareSuccess] = Right(MiddlewareSuccess())): Either[MiddlewareError,MiddlewareSuccess] = m match {

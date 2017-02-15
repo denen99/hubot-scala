@@ -2,6 +2,8 @@ package org.dberg.hubot.utils
 
 import com.typesafe.config.ConfigFactory
 import org.dberg.hubot.Hubot
+import org.dberg.hubot.models.{Message, MessageType}
+
 import scala.util.matching.Regex
 import scala.collection.JavaConversions._
 
@@ -13,8 +15,8 @@ object Helpers {
 
   implicit class RobotMatcher(body: String) {
 
-    def addressedToHubot(name: String): Boolean =
-       regex(name).findFirstIn(body).isDefined
+    def addressedToHubot(message: Message): Boolean =
+       message.messageType == MessageType.DirectMessage || regex(message.body).findFirstIn(body).isDefined
 
     def removeBotString(name: String): String =
       body.replaceFirst(regexStr(name), "")

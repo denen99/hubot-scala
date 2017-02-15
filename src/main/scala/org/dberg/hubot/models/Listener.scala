@@ -56,7 +56,7 @@ class TestListener(robot: RobotService) extends Listener(robot, "listen1\\s+", L
   def runCallback(message: Message) = {
     val resp = "listen1 heard " + message.body
     Logger.log("Running callback for listner TestListener, sending response " + resp,"debug")
-    robot.send(Message(message.user,resp))
+    robot.send(Message(message.user,resp, MessageType.DirectMessage))
   }
 
   val helpString = Some("listen1 -> Responds to anything and repeats it ")
@@ -66,7 +66,7 @@ class TestListener2(robot: RobotService) extends Listener(robot,"listen2") {
 
   def runCallback(message: Message) = {
     Logger.log("Running callback for listner TestListener2","debug")
-    robot.send(Message(message.user,message.body.reverse))
+    robot.send(Message(message.user,message.body.reverse, MessageType.DirectMessage))
   }
 
   val helpString = Some("listen2 -> reverses anything you send it ")
@@ -79,7 +79,7 @@ class HelpListener(robot: RobotService) extends Listener(robot,"^help") {
 
   def runCallback(message: Message) = {
     Logger.log("Running help listener","debug")
-    robot.send(Message(message.user,"Help commands \n" + helpCommands.mkString("\n")))
+    robot.send(Message(message.user,"Help commands \n" + helpCommands.mkString("\n"),MessageType.DirectMessage))
   }
 
   val helpString = Some("help -> list all available commands ")

@@ -11,12 +11,13 @@ lazy val root = (project in file(".")).
       "org.slf4j" % "slf4j-api" % "1.7.22",
       "org.slf4j" % "log4j-over-slf4j" % "1.7.22",  // for any java classes looking for this
       "ch.qos.logback" % "logback-classic" % "1.1.9" ,
-      "org.igniterealtime.smack" % "smack-core" % "4.1.6",
-      "org.igniterealtime.smack" % "smack-tcp" % "4.1.6",
-      "org.igniterealtime.smack" % "smackx" % "3.2.1",
-      "org.igniterealtime.smack" % "smack-im" % "4.1.6",
-      "org.igniterealtime.smack" % "smack-sasl-provided" % "4.1.6",
-      "org.igniterealtime.smack" % "smack-java7" % "4.1.6"
+      "org.igniterealtime.smack" % "smack-core" % "4.1.9",
+      "org.igniterealtime.smack" % "smack-tcp" % "4.1.9",
+//      "org.igniterealtime.smack" % "smackx" % "3.2.1",
+      "org.igniterealtime.smack" % "smack-im" % "4.1.9",
+      "org.igniterealtime.smack" % "smack-sasl-provided" % "4.1.9",
+      "org.igniterealtime.smack" % "smack-java7" % "4.1.9",
+      "org.igniterealtime.smack" % "smack-extensions" % "4.1.9"
     )
 )
 
