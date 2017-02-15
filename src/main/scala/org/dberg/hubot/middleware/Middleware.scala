@@ -13,7 +13,7 @@ abstract class Middleware() {
 
 }
 
-class TestMiddleware() extends Middleware {
+case class TestMiddleware() extends Middleware {
 
   def execute(message: Message) = {
     if (message.body == "blacklist") {

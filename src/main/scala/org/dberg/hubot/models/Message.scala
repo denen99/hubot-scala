@@ -1,19 +1,27 @@
 package org.dberg.hubot.models
 
-import org.dberg.hubot.Hubot
+import org.dberg.hubot.models.MessageType.MessageTypeValue
 
 
-abstract class MessageBase(user: User, body: String,  params: Map[String,String] = Map()) {
+object MessageType {
+  sealed trait MessageTypeValue
+  case object DirectMessage extends MessageTypeValue
+  case object GroupMessage extends MessageTypeValue
+}
+
+abstract class MessageBase(user: User, body: String,  messageType: MessageTypeValue , params: Map[String,String] = Map()) {
   val room = user.room
+  val robot = Robot.robotService
 
   def respondTo = {
-    val regex = s"""^${Robot.hubotName}"""
+    val regex = s"""^${robot.hubotName}"""
   }
 }
 
 final case class Message(
   user: User,
   body: String,
+  messageType: MessageTypeValue,
   params: Map[String,String] = Map(),
   done: Boolean = false
-) extends MessageBase(user,body)
+) extends MessageBase(user,body,messageType )
