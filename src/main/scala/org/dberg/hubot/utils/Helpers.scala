@@ -15,8 +15,8 @@ object Helpers {
 
   implicit class RobotMatcher(body: String) {
 
-    def addressedToHubot(message: Message): Boolean =
-       message.messageType == MessageType.DirectMessage || regex(message.body).findFirstIn(body).isDefined
+    def addressedToHubot(message: Message, hubotName: String): Boolean =
+       message.messageType == MessageType.DirectMessage || regex(hubotName).findFirstIn(body).isDefined
 
     def removeBotString(name: String): String =
       body.replaceFirst(regexStr(name), "")

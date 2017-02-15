@@ -28,7 +28,7 @@ abstract class Listener(
   def call(message: Message): Unit = {
     if (shouldRespond(message) ) {
       pattern.findFirstIn(message.body.removeBotString(robotName)) match {
-        case None => Logger.log("no match for listner " + this.getClass.getName)
+        case None => Logger.log("no match for listener " + this.getClass.getName)
         case Some(x) => runCallback(message.copy(
           body = message.body.removeBotString(robotName)
         ))
@@ -39,7 +39,7 @@ abstract class Listener(
 
   def shouldRespond(message: Message): Boolean = {
     println(s"message $message $listenerType ${message.body} $robotName")
-    listenerType == ListenerType.Hear || (listenerType ==  ListenerType.Respond && message.body.addressedToHubot(robotName))
+    listenerType == ListenerType.Hear || (listenerType ==  ListenerType.Respond && message.body.addressedToHubot(message,robot.hubotName))
   }
 
   def runCallback(message: Message): Unit
@@ -54,9 +54,9 @@ abstract class Listener(
 class TestListener(robot: RobotService) extends Listener(robot, "listen1\\s+", ListenerType.Hear) {
 
   def runCallback(message: Message) = {
-    val resp = "listen1 heard " + message.body
-    Logger.log("Running callback for listner TestListener, sending response " + resp,"debug")
-    robot.send(Message(message.user,resp, MessageType.DirectMessage))
+    val resp = "scalabot heard you !"
+    Logger.log("Running callback for listener TestListener, sending response " + resp,"debug")
+    robot.send(Message(message.user,resp, message.messageType))
   }
 
   val helpString = Some("listen1 -> Responds to anything and repeats it ")
@@ -65,8 +65,8 @@ class TestListener(robot: RobotService) extends Listener(robot, "listen1\\s+", L
 class TestListener2(robot: RobotService) extends Listener(robot,"listen2") {
 
   def runCallback(message: Message) = {
-    Logger.log("Running callback for listner TestListener2","debug")
-    robot.send(Message(message.user,message.body.reverse, MessageType.DirectMessage))
+    Logger.log("Running callback for listener TestListener2","debug")
+    robot.send(Message(message.user,message.body.reverse, message.messageType))
   }
 
   val helpString = Some("listen2 -> reverses anything you send it ")
@@ -79,7 +79,7 @@ class HelpListener(robot: RobotService) extends Listener(robot,"^help") {
 
   def runCallback(message: Message) = {
     Logger.log("Running help listener","debug")
-    robot.send(Message(message.user,"Help commands \n" + helpCommands.mkString("\n"),MessageType.DirectMessage))
+    robot.send(Message(message.user,"Help commands \n" + helpCommands.mkString("\n"),message.messageType))
   }
 
   val helpString = Some("help -> list all available commands ")

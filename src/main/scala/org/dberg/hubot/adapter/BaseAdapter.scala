@@ -2,7 +2,7 @@ package org.dberg.hubot.adapter
 
 import com.typesafe.scalalogging.{LazyLogging, StrictLogging}
 import org.dberg.hubot.Hubot
-import org.dberg.hubot.models.{Message, Robot, User}
+import org.dberg.hubot.models.{Message, MessageType, Robot, User}
 import org.dberg.hubot.models.Robot.RobotService
 import org.dberg.hubot.utils.Logger
 
@@ -32,7 +32,7 @@ case class ShellAdapter(robot: RobotService) extends BaseAdapter(robot: RobotSer
         .map(_.trim)
         .filter(_.nonEmpty)
         .foreach { resp =>
-      robot.receive(Message(User("adam"),resp))
+      robot.receive(Message(User("adam"),resp, MessageType.GroupMessage))
       }
     }
   }

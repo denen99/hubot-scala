@@ -118,13 +118,17 @@ class HipchatAdapter(robot: RobotService) extends BaseAdapter(robot: RobotServic
       conn.login()
     if (conn.isAuthenticated) {
 
-      val mucMgr = MultiUserChatManager.getInstanceFor(conn)
+
       mucMgr.getHostedRooms("conf.hipchat.com").asScala.foreach { room =>
         val muc = mucMgr.getMultiUserChat(room.getJid)
         muc.addMessageListener(new MessageMgrListener)
         val history = new DiscussionHistory()
         history.setMaxStanzas(0)
-        muc.join(robot.hubotName,null,history,SmackConfiguration.getDefaultPacketReplyTimeout)
+        Logger.log("Joining MUC room " + muc.getRoom() + " : " + muc.getNickname)
+        try {
+          muc.join("ScalaBot", null, history, SmackConfiguration.getDefaultPacketReplyTimeout)
+        }
+        catch { case e: Exception => Logger.log("Unable to join MUC room " + muc.getRoom + ": " + e.getMessage)}
       }
       while (conn.isAuthenticated) {
          // do nothing
@@ -135,8 +139,18 @@ class HipchatAdapter(robot: RobotService) extends BaseAdapter(robot: RobotServic
   }
 
   def send(message: HubotMessage) = {
-    val chat = chatMgr.createChat(message.user.room, new ChatListener)
-    chat.sendMessage(message.body)
+
+    Logger.log("Hipchat Adapter sending message : " + message.toString)
+    message.messageType match {
+      case MessageType.DirectMessage =>
+        val chat = chatMgr.createChat(message.user.room, new ChatListener)
+        chat.sendMessage(message.body)
+      case MessageType.GroupMessage =>
+        Logger.log("Sending message back to MUC " + message.user.room)
+        val muc = mucMgr.getMultiUserChat(message.user.room)
+        muc.sendMessage(message.body)
+    }
+
   }
 
   val jid = getConfString("hipchat.jid","none")
@@ -158,6 +172,8 @@ class HipchatAdapter(robot: RobotService) extends BaseAdapter(robot: RobotServic
   val conn = new XMPPTCPConnection(conf.build())
   val chatMgr = ChatManager.getInstanceFor(conn)
   chatMgr.addChatListener(new ChatMgrListener)
+
+  val mucMgr = MultiUserChatManager.getInstanceFor(conn)
 
   val connectListener = new ConnectListener(conn)(run)
 
