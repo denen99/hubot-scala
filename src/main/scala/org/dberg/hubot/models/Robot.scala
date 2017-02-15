@@ -11,6 +11,7 @@ trait RobotComponent {
   val adapter: BaseAdapter
   def processMiddleware(message: Message): Either[MiddlewareError,MiddlewareSuccess]
   def processListeners(message: Message): Unit
+  val helpCommands: Seq[Option[String]]
 
   class RobotService {
 
@@ -58,6 +59,8 @@ object Robot extends RobotComponent {
         throw new Exception("Invalid listener in configuration, " + x.toString)
     })
   }
+
+  val helpCommands = listeners.map(l => l.helpString).filter(l => l.isDefined)
 
   val adapter: BaseAdapter = {
     val a = getConfString("hubot.adapter","shell")

@@ -75,7 +75,7 @@ class TestListener2(robot: RobotService) extends Listener(robot,"listen2") {
 
 class HelpListener(robot: RobotService) extends Listener(robot,"^help") {
 
-  val helpCommands = Seq("help", "help2")
+  val helpCommands = Robot.helpCommands
 
   def runCallback(message: Message) = {
     Logger.log("Running help listener","debug")
