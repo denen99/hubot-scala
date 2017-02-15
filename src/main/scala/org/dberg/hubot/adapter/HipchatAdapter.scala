@@ -126,7 +126,7 @@ class HipchatAdapter(robot: RobotService) extends BaseAdapter(robot: RobotServic
         muc.addMessageListener(new MessageMgrListener)
         val history = new DiscussionHistory()
         history.setMaxStanzas(0)
-        muc.join("ScalaBot",null,history,SmackConfiguration.getDefaultPacketReplyTimeout)
+        muc.join(robot.hubotName,null,history,SmackConfiguration.getDefaultPacketReplyTimeout)
       }
       while (conn.isAuthenticated) {
          // do nothing
