@@ -117,7 +117,7 @@ class HipchatAdapter(robot: RobotService) extends BaseAdapter(robot: RobotServic
     if (!conn.isAuthenticated)
       conn.login()
     if (conn.isAuthenticated) {
-      
+
       val mucMgr = MultiUserChatManager.getInstanceFor(conn)
       mucMgr.getHostedRooms("conf.hipchat.com").asScala.foreach { room =>
         val muc = mucMgr.getMultiUserChat(room.getJid)

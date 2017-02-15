@@ -1,11 +1,11 @@
 hubot {
   name = "scalabot"
 
-  listeners = ["org.dberg.hubot.models.TestListener", "org.dberg.hubot.models.TestListener2"]
+  listeners = ["test", "test2"]
 
   middleware = []
 
-  adapter = "org.dberg.hubot.adapter.HipchatAdapter"
+  adapter = "hipchat"
 }
 
 hipchat {
