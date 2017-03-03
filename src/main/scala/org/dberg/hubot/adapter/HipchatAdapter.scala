@@ -18,7 +18,7 @@ import org.jivesoftware.smack.packet.{Presence, Stanza, Message => SmackMessage}
 
 
 
-class HipchatAdapter(robot: Hubot) extends BaseAdapter(robot: Hubot) {
+class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) {
 
   object HipchatAdapterTools {
     val regex = "(^[^/]+)"
@@ -45,7 +45,7 @@ class HipchatAdapter(robot: Hubot) extends BaseAdapter(robot: Hubot) {
         if (msg.getBody != null) {
           val jid = getJid(msg.getFrom)
           val user = User(jid)
-          robot.robotService.receive(HubotMessage(user, msg.getBody, MessageType.DirectMessage))
+          hubot.robotService.receive(HubotMessage(user, msg.getBody, MessageType.DirectMessage))
         }
       }
     }
@@ -101,7 +101,7 @@ class HipchatAdapter(robot: Hubot) extends BaseAdapter(robot: Hubot) {
         if (message.getBody != null) {
           val jid = getJid(message.getFrom)
           val user = User(jid)
-          robot.robotService.receive(HubotMessage(user, message.getBody, MessageType.GroupMessage))
+          hubot.robotService.receive(HubotMessage(user, message.getBody, MessageType.GroupMessage))
         }
       }
 

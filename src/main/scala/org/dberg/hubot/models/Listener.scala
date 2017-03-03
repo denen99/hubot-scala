@@ -17,15 +17,15 @@ object ListenerType {
 
 
 abstract class Listener(
-                         val robotSvc: Hubot,
+                         val hubot: Hubot,
                          matcher: String,
                          listenerType: ListenerValue = ListenerType.Respond
 )  {
 
   //val robot = Robot.robotService
   val pattern = Pattern.compile(matcher)
-  val robot = robotSvc.robotService
-  val brain = robotSvc.brainService
+  val robot = hubot.robotService
+  val brain = hubot.brainService
 
 
   def buildGroups(matcher: Matcher, count: Int , results: Seq[String] = Seq()): Seq[String] = count match {
@@ -42,7 +42,7 @@ abstract class Listener(
           val groups = buildGroups(matcher,matcher.groupCount())
           runCallback(message.copy(
           body = message.body.removeBotString(robot.hubotName)
-        ))
+        ), groups)
       }
     }
     else { Logger.log("Sorry, listeners says we should not respond")}
@@ -53,7 +53,7 @@ abstract class Listener(
     listenerType == ListenerType.Hear || (listenerType ==  ListenerType.Respond && message.body.addressedToHubot(message,robot.hubotName))
   }
 
-  def runCallback(message: Message): Unit
+  def runCallback(message: Message, groups: Seq[String]): Unit
 
   def helpString: Option[String]
 }
@@ -62,35 +62,35 @@ abstract class Listener(
 //-------------------------------------
 // SOME TEST LISTENERS FOR NOW
 //-------------------------------------
-class TestListener(robot: Hubot ) extends Listener(robot,  "listen1\\s+", ListenerType.Hear) {
+class TestListener(hubot: Hubot ) extends Listener(hubot,  "listen1\\s+(.*)", ListenerType.Hear) {
 
-  def runCallback(message: Message) = {
-    val resp = "scalabot heard you !"
+  def runCallback(message: Message, groups: Seq[String]) = {
+    val resp = "scalabot heard you mention " + groups.head + " !"
     Logger.log("Running callback for listener TestListener, sending response " + resp,"debug")
-    robot.robotService.send(Message(message.user,resp, message.messageType))
+    hubot.robotService.send(Message(message.user,resp, message.messageType))
   }
 
   val helpString = Some("listen1 -> Responds to anything and repeats it ")
 }
 
-class TestListener2(robot: Hubot ) extends Listener(robot,"listen2") {
+class TestListener2(hubot: Hubot ) extends Listener(hubot,"listen2") {
 
-  def runCallback(message: Message) = {
+  def runCallback(message: Message, groups: Seq[String]) = {
     Logger.log("Running callback for listener TestListener2","debug")
-    robot.robotService.send(Message(message.user,message.body.reverse, message.messageType))
+    hubot.robotService.send(Message(message.user,message.body.reverse, message.messageType))
   }
 
   val helpString = Some("listen2 -> reverses anything you send it ")
 
 }
 
-class HelpListener(robot: Hubot) extends Listener(robot,"^help") {
+class HelpListener(hubot: Hubot) extends Listener(hubot,"^help") {
 
-  val helpCommands = robot.helpCommands
+  val helpCommands = hubot.helpCommands
 
-  def runCallback(message: Message) = {
+  def runCallback(message: Message, groups: Seq[String]) = {
     Logger.log("Running help listener","debug")
-    robot.robotService.send(Message(message.user,"Help commands \n" + helpCommands.mkString("\n"),message.messageType))
+    hubot.robotService.send(Message(message.user,"Help commands \n" + helpCommands.mkString("\n"),message.messageType))
   }
 
   val helpString = Some("help -> list all available commands ")

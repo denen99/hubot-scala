@@ -11,11 +11,7 @@ object MessageType {
 
 abstract class MessageBase(user: User, body: String,  messageType: MessageTypeValue , params: Map[String,String] = Map()) {
   val room = user.room
-//  val robot = Robot.robotService
 
-//  def respondTo = {
-//    val regex = s"""^${robot.hubotName}"""
-//  }
 }
 
 final case class Message(
