@@ -1,7 +1,6 @@
 package org.dberg.hubot.utils
 
 import com.typesafe.config.ConfigFactory
-import org.dberg.hubot.Hubot
 import org.dberg.hubot.models.{Message, MessageType}
 
 import scala.util.matching.Regex
