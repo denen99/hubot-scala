@@ -6,10 +6,9 @@ import org.dberg.hubot.middleware.{Middleware, MiddlewareError, MiddlewareSucces
 import org.dberg.hubot.models._
 import org.dberg.hubot.robot.RobotComponent
 import org.dberg.hubot.utils.Helpers.{getConfString, getConfStringList}
-import org.dberg.hubot.utils.Logger
+import com.typesafe.scalalogging.StrictLogging
 
-
-class Hubot extends RobotComponent with BrainComponent {
+class Hubot extends RobotComponent with BrainComponent with StrictLogging {
 
   val robotService = new RobotService
   val brainService = new BrainService
@@ -18,20 +17,20 @@ class Hubot extends RobotComponent with BrainComponent {
   val listeners: Seq[Listener] = {
     getConfStringList("hubot.listeners").map({
       case "test" =>
-        Logger.log("Registering listener: test","debug")
+        logger.debug("Registering listener: test")
         new TestListener(this)
       case "test2" =>
-        Logger.log("Registering listener: test2","debug")
+        logger.debug("Registering listener: test2")
         new TestListener2(this)
       case "help" =>
-        Logger.log("Registering listener: help","debug")
+        logger.debug("Registering listener: help")
         new HelpListener(this)
       case x =>
-        Logger.log("Sorry, unknown listener " + x,"debug")
+        logger.debug("Sorry, unknown listener " + x)
         throw new Exception("Invalid listener in configuration, " + x.toString)
     })
   }
-  
+
   val adapter: BaseAdapter = {
     val a = getConfString("hubot.adapter","shell")
     a match {
@@ -43,10 +42,10 @@ class Hubot extends RobotComponent with BrainComponent {
   val middleware = {
     getConfStringList("hubot.middleware").map({
       case "test" => TestMiddleware
-      case x => Logger.log("Sorry, uknown middleware in config " + x,"debug")
+      case x => logger.info("Sorry, uknown middleware in config " + x,"debug")
     }).asInstanceOf[Seq[Middleware]]
   }
-  
+
 
 }
 
