@@ -1,24 +1,28 @@
 package org.dberg.hubot.brain
 
-import org.mapdb._
+import org.dberg.hubot.utils.Helpers._
 
-trait BrainComponent {
+trait BrainComponent { 
 
   val brainService: BrainService
 
   class BrainService {
 
-    val db = DBMaker.fileDB("testfile").make()
-    val dbHash = db.hashMap("hubot",Serializer.STRING,Serializer.STRING).createOrOpen()
+    private val backend = {
+      getConfString("hubot.brain","mapdb") match {
+        case "mapdb" => MapdbBackend
+        case _ => MapdbBackend
+      }
+    }
+    
+    def set(key: String, value: String) = backend.setKey(key,value)
 
-     def set(key: String, value: String) = {
-        dbHash.put(key,value)
-     }
+    def get(key: String) = backend.getKey(key)
 
-     def get(key: String, value: String) = {
-        dbHash.get(key)
-     }
+    def shutdown = backend.shutdown() 
+    
   }
+
 }
 
 
