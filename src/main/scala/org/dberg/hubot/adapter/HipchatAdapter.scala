@@ -2,11 +2,9 @@ package org.dberg.hubot.adapter
 
 import java.util.regex.Pattern
 import javax.net.ssl.{HostnameVerifier, SSLSession}
-
+import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.Hubot
-
 import collection.JavaConverters._
-import org.dberg.hubot.utils.Logger
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.chat.{Chat, ChatManager, ChatManagerListener, ChatMessageListener}
 import org.jivesoftware.smackx.muc.{DiscussionHistory, MultiUserChat, MultiUserChatManager, RoomInfo}
@@ -16,9 +14,7 @@ import org.dberg.hubot.utils.Helpers._
 import org.jivesoftware.smack.packet.{Presence, Stanza, Message => SmackMessage}
 
 
-
-
-class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) {
+class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with StrictLogging {
 
   object HipchatAdapterTools {
     val regex = "(^[^/]+)/?(.*)?"
@@ -44,13 +40,11 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) {
     /******************************************
       * Callback for 1-1 Chat messages
       *******************************************/
-    class ChatListener extends ChatMessageListener {
-
-
+    class ChatListener extends ChatMessageListener with StrictLogging {
 
       def processMessage(chat: Chat, msg: SmackMessage) = {
-        Logger.log("chat: " + chat.toString)
-        Logger.log("msg: " + msg.toString)
+        logger.debug("chat: " + chat.toString)
+        logger.debug("msg: " + msg.toString)
         if (msg.getBody != null) {
           val jid = getJid(msg.getFrom)
           val user = User(jid)
@@ -64,29 +58,29 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) {
       * *******************************************/
     class ConnectListener(conn: XMPPTCPConnection)(onClose: () => Unit) extends ConnectionListener {
       def connected(connection: XMPPConnection) =
-        Logger.log("Received connection from user : " + connection.getUser,"debug")
+        logger.debug("Received connection from user : " + connection.getUser)
 
       def reconnectionFailed(e: Exception) =
-        Logger.log("Connection failed : " + e.getMessage,"error")
+        logger.error("Connection failed : ", e)
 
       def reconnectionSuccessful =
-        Logger.log("Reconnection successful","debug")
+        logger.debug("Reconnection successful")
 
       def authenticated(connection: XMPPConnection, resumed: Boolean) =
-        Logger.log("Authenticated Successful","info")
+        logger.info("Authenticated Successful")
 
       def connectionClosedOnError(e: Exception) = {
-        Logger.log("Connection closed : " + e.getMessage + ", attempting to re-connect","info")
+        logger.info("Connection closed with error, attempting to re-connect", e)
         conn.removeConnectionListener(this)
         conn.disconnect()
         onClose()
       }
 
       def connectionClosed =
-        Logger.log("Error, connection closed","debug")
+        logger.debug("Error, connection closed")
 
       def reconnectingIn(seconds: Int) =
-        Logger.log("Reconnecting in " + seconds.toString + " seconds","debug")
+        logger.debug("Reconnecting in " + seconds.toString + " seconds")
     }
 
     /******************************************
@@ -103,10 +97,10 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) {
     /******************************************
       * Callback for GroupChats
       *******************************************/
-    class MessageMgrListener extends MessageListener {
+    class MessageMgrListener extends MessageListener with StrictLogging {
 
       def processMessage(message: SmackMessage) =  {
-        Logger.log("received muc message " + message)
+        logger.debug("received muc message " + message)
         if (message.getBody != null) {
           val jid = getJid(message.getFrom)
           val user = User(jid)
@@ -131,35 +125,34 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) {
       conn.login()
     if (conn.isAuthenticated) {
 
-
       mucMgr.getHostedRooms("conf.hipchat.com").asScala.foreach { room =>
         val muc = mucMgr.getMultiUserChat(room.getJid)
         muc.addMessageListener(new MessageMgrListener)
         val history = new DiscussionHistory()
         history.setMaxStanzas(0)
-        Logger.log("Joining MUC room " + muc.getRoom() + " : " + muc.getNickname)
+        logger.debug("Joining MUC room " + muc.getRoom() + " : " + muc.getNickname)
         try {
           muc.join(chatAlias, null, history, SmackConfiguration.getDefaultPacketReplyTimeout)
+        } catch { case e: Exception =>
+          logger.error("Unable to join MUC room " + muc.getRoom + ": ", e)
         }
-        catch { case e: Exception => Logger.log("Unable to join MUC room " + muc.getRoom + ": " + e.getMessage)}
       }
       while (conn.isAuthenticated) {
          // do nothing
       }
-      Logger.log("Error - disconnected from server, reconnecting","error")
+      logger.error("Error - disconnected from server, reconnecting")
       run()
     }
   }
 
   def send(message: HubotMessage) = {
-
-    Logger.log("Hipchat Adapter sending message : " + message.toString)
+    logger.debug("Hipchat Adapter sending message : " + message.toString)
     message.messageType match {
       case MessageType.DirectMessage =>
         val chat = chatMgr.createChat(message.user.room, new ChatListener)
         chat.sendMessage(message.body)
       case MessageType.GroupMessage =>
-        Logger.log("Sending message back to MUC " + message.user.room)
+        logger.debug("Sending message back to MUC " + message.user.room)
         val muc = mucMgr.getMultiUserChat(message.user.room)
         muc.sendMessage(message.body)
     }

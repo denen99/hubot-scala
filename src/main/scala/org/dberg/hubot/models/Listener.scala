@@ -3,8 +3,8 @@ package org.dberg.hubot.models
 
 import java.util.regex.{Matcher, Pattern}
 
+import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.Hubot
-import org.dberg.hubot.utils.Logger
 import org.dberg.hubot.models.ListenerType.ListenerValue
 import org.dberg.hubot.utils.Helpers._
 
@@ -20,13 +20,10 @@ abstract class Listener(
                          val hubot: Hubot,
                          matcher: String,
                          listenerType: ListenerValue = ListenerType.Respond
-)  {
-
-  //val robot = Robot.robotService
+) extends StrictLogging {
   val pattern = Pattern.compile(matcher)
   val robot = hubot.robotService
   val brain = hubot.brainService
-
 
   def buildGroups(matcher: Matcher, count: Int , results: Seq[String] = Seq()): Seq[String] = count match {
     case 0 => results
@@ -37,15 +34,16 @@ abstract class Listener(
     if (shouldRespond(message) ) {
       val matcher = pattern.matcher(message.body.removeBotString(robot.hubotName))
       matcher.find() match {
-        case false => Logger.log("no match for listener " + this.getClass.getName)
+        case false => logger.debug("no match for listener " + this.getClass.getName)
         case true =>
           val groups = buildGroups(matcher,matcher.groupCount())
           runCallback(message.copy(
           body = message.body.removeBotString(robot.hubotName)
         ), groups)
       }
+    } else {
+      logger.debug("Sorry, listeners says we should not respond")
     }
-    else { Logger.log("Sorry, listeners says we should not respond")}
   }
 
   def shouldRespond(message: Message): Boolean = {
@@ -68,7 +66,7 @@ class TestListener(hubot: Hubot ) extends Listener(hubot,  "listen1\\s+(.*)", Li
     val lastMessage = brain.get("lastmessage")
     val resp = "scalabot heard you mention " + groups.head + " !, the last thing you said was " + lastMessage
     brain.set("lastmessage",message.body)
-    Logger.log("Running callback for listener TestListener, sending response " + resp,"debug")
+    logger.debug("Running callback for listener TestListener, sending response " + resp)
     hubot.robotService.send(Message(message.user,resp, message.messageType))
   }
 
@@ -78,7 +76,7 @@ class TestListener(hubot: Hubot ) extends Listener(hubot,  "listen1\\s+(.*)", Li
 class TestListener2(hubot: Hubot ) extends Listener(hubot,"listen2") {
 
   def runCallback(message: Message, groups: Seq[String]) = {
-    Logger.log("Running callback for listener TestListener2","debug")
+    logger.debug("Running callback for listener TestListener2")
     hubot.robotService.send(Message(message.user,message.body.reverse, message.messageType))
   }
 
@@ -91,7 +89,7 @@ class HelpListener(hubot: Hubot) extends Listener(hubot,"^help") {
   val helpCommands = hubot.listeners.map(l => l.helpString).filter(l => l.isDefined)
 
   def runCallback(message: Message, groups: Seq[String]) = {
-    Logger.log("Running help listener","debug")
+    logger.debug("Running help listener")
     hubot.robotService.send(Message(message.user,"Help commands \n" + helpCommands.mkString("\n"),message.messageType))
   }
 

@@ -1,6 +1,6 @@
 package org.dberg.hubot.robot
 
-import org.dberg.hubot.utils.Logger
+import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.adapter.BaseAdapter
 import org.dberg.hubot.middleware.{Middleware, MiddlewareError, MiddlewareSuccess}
 import org.dberg.hubot.models.{Listener, Message}
@@ -13,12 +13,13 @@ trait RobotComponent {
   val listeners: Seq[Listener]
   val middleware: Seq[Middleware]
 
-  class RobotService {
+  class RobotService extends StrictLogging {
 
-
-    private def processMiddlewareRec(message: Message,
-                                     m: Seq[Middleware],
-                                     prevResult: Either[MiddlewareError,MiddlewareSuccess] = Right(MiddlewareSuccess())): Either[MiddlewareError,MiddlewareSuccess] = m match {
+    private def processMiddlewareRec(
+      message: Message,
+      m: Seq[Middleware],
+      prevResult: Either[MiddlewareError,MiddlewareSuccess] = Right(MiddlewareSuccess())
+    ): Either[MiddlewareError,MiddlewareSuccess] = m match {
       case Nil => prevResult
       case h :: t if prevResult.isRight => processMiddlewareRec(message,t,h.execute(message))
       case _ =>  prevResult
@@ -28,20 +29,24 @@ trait RobotComponent {
 
     
     def processListeners( message: Message) = {
-      listeners.foreach { l => Logger.log("Processing message through listener " + l.toString);   l.call(message) }
+      listeners.foreach { l =>
+        logger.debug("Processing message through listener " + l.toString)
+        l.call(message)
+      }
     }
 
     val hubotName = getConfString("hubot.name","hubot")
 
 
     def receive(message: Message) = {
-      Logger.log("Received message " + message)
+      logger.debug("Received message " + message)
       //Loop through middleware, halting if need be
       //then send to each listener
       processMiddleware(message) match {
-        case Left(x) => Logger.log("Sorry, middleware error " + x.error)
-        case Right(x) =>
-          Logger.log("Middleware passed")
+        case Left(x) =>
+          logger.error("Sorry, middleware error " + x.error)
+        case Right(_) =>
+          logger.debug("Middleware passed")
           processListeners(message)
       }
     }

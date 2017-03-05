@@ -1,6 +1,5 @@
 package org.dberg.hubot.middleware
 
-import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.models.Message
 
 trait MiddlewareResponse

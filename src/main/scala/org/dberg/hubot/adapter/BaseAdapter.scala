@@ -1,18 +1,18 @@
 package org.dberg.hubot.adapter
 
 
+import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.Hubot
 import org.dberg.hubot.models.{Message, MessageType, User}
-import org.dberg.hubot.utils.Logger
 
-abstract class BaseAdapter(hubot: Hubot) {
+abstract class BaseAdapter(hubot: Hubot) extends StrictLogging {
 
   def send(message: Message): Unit
 
   def run(): Unit
 
   def receive( message: Message): Unit = {
-    Logger.log("Adapter received message : " + message,"debug")
+    logger.debug("Adapter received message : " + message)
     hubot.robotService.receive(message)
   }
 }
@@ -24,7 +24,8 @@ case class ShellAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) {
     println(message.body)
 
   def run() = {
-    Logger.log("Running adapter " + this.getClass.getName,"info")
+    logger.info("Running adapter " + this.getClass.getName)
+
     while(true) {
       print(hubot.robotService.hubotName + " >")
       Option(scala.io.StdIn.readLine())
