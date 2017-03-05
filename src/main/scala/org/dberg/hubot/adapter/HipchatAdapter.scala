@@ -101,6 +101,7 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) {
         if (message.getBody != null) {
           val jid = getJid(message.getFrom)
           val user = User(jid)
+          if (message.)
           hubot.robotService.receive(HubotMessage(user, message.getBody, MessageType.GroupMessage))
         }
       }
@@ -128,7 +129,7 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) {
         history.setMaxStanzas(0)
         Logger.log("Joining MUC room " + muc.getRoom() + " : " + muc.getNickname)
         try {
-          muc.join("ScalaBot", null, history, SmackConfiguration.getDefaultPacketReplyTimeout)
+          muc.join(chatAlias, null, history, SmackConfiguration.getDefaultPacketReplyTimeout)
         }
         catch { case e: Exception => Logger.log("Unable to join MUC room " + muc.getRoom + ": " + e.getMessage)}
       }
@@ -157,6 +158,7 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) {
 
   val jid = getConfString("hipchat.jid","none")
   val password = getConfString("hipchat.password","none")
+  val chatAlias = getConfString("hipchat.chatAlias","ScalaBot")
 
   val verify = new HostnameVerifier {
     override def verify(s: String, sslSession: SSLSession): Boolean = true
