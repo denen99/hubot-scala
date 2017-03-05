@@ -5,9 +5,9 @@ import org.dberg.hubot.utils.Helpers._
 
 object MapdbBackend extends BrainBackendBase {
 
-  val dbFile = getConfString("hubot.brainFile","/tmp/brain.db")
-  val db = DBMaker.fileDB("testfile").make()
-  val dbHash = db.hashMap("hubot",Serializer.STRING,Serializer.STRING).createOrOpen()
+  private val dbFile = getConfString("hubot.brainFile","/tmp/brain.db")
+  private val db = DBMaker.fileDB(dbFile).make()
+  private val dbHash = db.hashMap("hubot",Serializer.STRING,Serializer.STRING).createOrOpen()
 
   def setKey(key: String, value: String) = {
     dbHash.put(key,value)
