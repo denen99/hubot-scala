@@ -6,6 +6,10 @@ hubot {
   middleware = []
 
   adapter = "hipchat"
+
+  brain = "mapdb"
+  brainFile = "/tmp/brain.db"
+
 }
 
 hipchat {

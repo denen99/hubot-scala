@@ -1,7 +1,7 @@
 package org.dberg.hubot.middleware
 
 import com.typesafe.scalalogging.StrictLogging
-import org.dberg.hubot.models.{Message, Robot}
+import org.dberg.hubot.models.Message
 
 trait MiddlewareResponse
 case class MiddlewareError(error: String) extends MiddlewareResponse

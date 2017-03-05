@@ -17,7 +17,8 @@ lazy val root = (project in file(".")).
       "org.igniterealtime.smack" % "smack-im" % "4.1.9",
       "org.igniterealtime.smack" % "smack-sasl-provided" % "4.1.9",
       "org.igniterealtime.smack" % "smack-java7" % "4.1.9",
-      "org.igniterealtime.smack" % "smack-extensions" % "4.1.9"
+      "org.igniterealtime.smack" % "smack-extensions" % "4.1.9",
+      "org.mapdb" % "mapdb" % "3.0.2"
     )
 )
 

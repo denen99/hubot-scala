@@ -33,3 +33,4 @@ target
 .java-version
 
 src/main/resources/*.conf
+testfile
