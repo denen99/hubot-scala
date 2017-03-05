@@ -31,9 +31,7 @@ class Hubot extends RobotComponent with BrainComponent {
         throw new Exception("Invalid listener in configuration, " + x.toString)
     })
   }
-
-  val helpCommands = listeners.map(l => l.helpString).filter(l => l.isDefined)
-
+  
   val adapter: BaseAdapter = {
     val a = getConfString("hubot.adapter","shell")
     a match {
@@ -48,20 +46,7 @@ class Hubot extends RobotComponent with BrainComponent {
       case x => Logger.log("Sorry, uknown middleware in config " + x,"debug")
     }).asInstanceOf[Seq[Middleware]]
   }
-
-  private def processMiddlewareRec(message: Message,
-                                   m: Seq[Middleware],
-                                   prevResult: Either[MiddlewareError,MiddlewareSuccess] = Right(MiddlewareSuccess())): Either[MiddlewareError,MiddlewareSuccess] = m match {
-    case Nil => prevResult
-    case h :: t if prevResult.isRight => processMiddlewareRec(message,m.tail,h.execute(message))
-    case _ =>  prevResult
-  }
-
-  def processMiddleware(message: Message) = processMiddlewareRec(message: Message, middleware)
-
-  def processListeners( message: Message) = {
-    listeners.foreach { l => Logger.log("Processing message through listener " + l.toString);   l.call(message) }
-  }
+  
 
 }
 
