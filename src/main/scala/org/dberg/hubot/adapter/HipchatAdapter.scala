@@ -21,7 +21,7 @@ import org.jivesoftware.smack.packet.{Presence, Stanza, Message => SmackMessage}
 class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) {
 
   object HipchatAdapterTools {
-    val regex = "(^[^/]+)"
+    val regex = "(^[^/]+)/?(.*)?"
     val pattern = Pattern.compile(regex)
 
     def getJid(from: String): String = {
@@ -31,6 +31,15 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) {
       else
         "Invalid JID"
     }
+
+    def getPresence(from: String): String = {
+      val matcher = pattern.matcher(from)
+      if (matcher.find())
+        matcher.group(2)
+      else
+        "Invalid Presence"
+    }
+
 
     /******************************************
       * Callback for 1-1 Chat messages
@@ -101,8 +110,9 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) {
         if (message.getBody != null) {
           val jid = getJid(message.getFrom)
           val user = User(jid)
-          if (message.)
-          hubot.robotService.receive(HubotMessage(user, message.getBody, MessageType.GroupMessage))
+          //Dont process messages if the bot sent them to avoid loops !
+          if (getPresence(message.getFrom) != chatAlias)
+            hubot.robotService.receive(HubotMessage(user, message.getBody, MessageType.GroupMessage))
         }
       }
 
