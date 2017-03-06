@@ -1,18 +1,17 @@
 package org.dberg.hubot.adapter
 
 import java.util.regex.Pattern
-import javax.net.ssl.{HostnameVerifier, SSLSession}
+import javax.net.ssl.{ HostnameVerifier, SSLSession }
 import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.Hubot
 import collection.JavaConverters._
 import org.jivesoftware.smack._
-import org.jivesoftware.smack.chat.{Chat, ChatManager, ChatManagerListener, ChatMessageListener}
-import org.jivesoftware.smackx.muc.{DiscussionHistory, MultiUserChat, MultiUserChatManager, RoomInfo}
-import org.jivesoftware.smack.tcp.{XMPPTCPConnection, XMPPTCPConnectionConfiguration}
-import org.dberg.hubot.models.{MessageType, User, Message => HubotMessage}
+import org.jivesoftware.smack.chat.{ Chat, ChatManager, ChatManagerListener, ChatMessageListener }
+import org.jivesoftware.smackx.muc.{ DiscussionHistory, MultiUserChat, MultiUserChatManager, RoomInfo }
+import org.jivesoftware.smack.tcp.{ XMPPTCPConnection, XMPPTCPConnectionConfiguration }
+import org.dberg.hubot.models.{ MessageType, User, Message => HubotMessage }
 import org.dberg.hubot.utils.Helpers._
-import org.jivesoftware.smack.packet.{Presence, Stanza, Message => SmackMessage}
-
+import org.jivesoftware.smack.packet.{ Presence, Stanza, Message => SmackMessage }
 
 class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with StrictLogging {
 
@@ -36,10 +35,11 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
         "Invalid Presence"
     }
 
-
-    /******************************************
-      * Callback for 1-1 Chat messages
-      *******************************************/
+    /**
+     * ****************************************
+     * Callback for 1-1 Chat messages
+     * *****************************************
+     */
     class ChatListener extends ChatMessageListener with StrictLogging {
 
       def processMessage(chat: Chat, msg: SmackMessage) = {
@@ -53,9 +53,11 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
       }
     }
 
-    /******************************************
-      * Callback for Connection Events
-      * *******************************************/
+    /**
+     * ****************************************
+     * Callback for Connection Events
+     * ******************************************
+     */
     class ConnectListener(conn: XMPPTCPConnection)(onClose: () => Unit) extends ConnectionListener {
       def connected(connection: XMPPConnection) =
         logger.debug("Received connection from user : " + connection.getUser)
@@ -83,9 +85,11 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
         logger.debug("Reconnecting in " + seconds.toString + " seconds")
     }
 
-    /******************************************
-      * Callback for 1-1 Chat messages
-      *******************************************/
+    /**
+     * ****************************************
+     * Callback for 1-1 Chat messages
+     * *****************************************
+     */
     class ChatMgrListener extends ChatManagerListener {
       def chatCreated(chat: Chat, createdLocally: Boolean) = {
         if (!createdLocally) {
@@ -94,12 +98,14 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
       }
     }
 
-    /******************************************
-      * Callback for GroupChats
-      *******************************************/
+    /**
+     * ****************************************
+     * Callback for GroupChats
+     * *****************************************
+     */
     class MessageMgrListener extends MessageListener with StrictLogging {
 
-      def processMessage(message: SmackMessage) =  {
+      def processMessage(message: SmackMessage) = {
         logger.debug("received muc message " + message)
         if (message.getBody != null) {
           val jid = getJid(message.getFrom)
@@ -111,7 +117,6 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
       }
 
     }
-
 
   }
 
@@ -133,12 +138,13 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
         logger.debug("Joining MUC room " + muc.getRoom() + " : " + muc.getNickname)
         try {
           muc.join(chatAlias, null, history, SmackConfiguration.getDefaultPacketReplyTimeout)
-        } catch { case e: Exception =>
-          logger.error("Unable to join MUC room " + muc.getRoom + ": ", e)
+        } catch {
+          case e: Exception =>
+            logger.error("Unable to join MUC room " + muc.getRoom + ": ", e)
         }
       }
       while (conn.isAuthenticated) {
-         // do nothing
+        // do nothing
       }
       logger.error("Error - disconnected from server, reconnecting")
       run()
@@ -159,9 +165,9 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
 
   }
 
-  val jid = getConfString("hipchat.jid","none")
-  val password = getConfString("hipchat.password","none")
-  val chatAlias = getConfString("hipchat.chatAlias","ScalaBot")
+  val jid = getConfString("hipchat.jid", "none")
+  val password = getConfString("hipchat.password", "none")
+  val chatAlias = getConfString("hipchat.chatAlias", "ScalaBot")
 
   val verify = new HostnameVerifier {
     override def verify(s: String, sslSession: SSLSession): Boolean = true

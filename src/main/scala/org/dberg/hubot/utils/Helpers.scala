@@ -1,11 +1,10 @@
 package org.dberg.hubot.utils
 
 import com.typesafe.config.ConfigFactory
-import org.dberg.hubot.models.{Message, MessageType}
+import org.dberg.hubot.models.{ Message, MessageType }
 
 import scala.util.matching.Regex
 import scala.collection.JavaConversions._
-
 
 object Helpers {
 
@@ -15,7 +14,7 @@ object Helpers {
   implicit class RobotMatcher(body: String) {
 
     def addressedToHubot(message: Message, hubotName: String): Boolean =
-       message.messageType == MessageType.DirectMessage || regex(hubotName).findFirstIn(body).isDefined
+      message.messageType == MessageType.DirectMessage || regex(hubotName).findFirstIn(body).isDefined
 
     def removeBotString(name: String): String =
       body.replaceFirst(regexStr(name), "")
@@ -25,7 +24,7 @@ object Helpers {
   val config = ConfigFactory.load()
 
   def getConfString(key: String, default: String): String = config.hasPath(key) match {
-    case false =>  default
+    case false => default
     case true => config.getString(key)
   }
 
