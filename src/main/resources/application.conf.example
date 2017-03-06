@@ -1,11 +1,11 @@
 hubot {
   name = "scalabot"
 
-  listeners = ["test", "test2"]
+  listeners = ["org.dberg.hubot.models.TestListener", "org.dberg.hubot.models.TestListener2", "org.dberg.hubot.models.HelpListener"]
 
   middleware = []
 
-  adapter = "hipchat"
+  adapter = "org.dberg.hubot.adapter.ShellAdapter"
 
   brain = "mapdb"
   brainFile = "/tmp/brain.db"

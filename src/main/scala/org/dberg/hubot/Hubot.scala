@@ -15,35 +15,25 @@ class Hubot extends RobotComponent with BrainComponent with StrictLogging {
 
 
   val listeners: Seq[Listener] = {
-    getConfStringList("hubot.listeners").map({
-      case "test" =>
-        logger.debug("Registering listener: test")
-        new TestListener(this)
-      case "test2" =>
-        logger.debug("Registering listener: test2")
-        new TestListener2(this)
-      case "help" =>
-        logger.debug("Registering listener: help")
-        new HelpListener(this)
-      case x =>
-        logger.debug("Sorry, unknown listener " + x)
-        throw new Exception("Invalid listener in configuration, " + x.toString)
-    })
-  }
+    getConfStringList("hubot.listeners").map({ l =>
+     logger.debug("Registering listener " + l)
+        val c = Class.forName(l).getConstructor(this.getClass)
+        c.newInstance(this).asInstanceOf[Listener]
+    }
+  )}
 
   val adapter: BaseAdapter = {
-    val a = getConfString("hubot.adapter","shell")
-    a match {
-      case "shell" => new ShellAdapter(this)
-      case "hipchat" => new HipchatAdapter(this)
-    }
+    val a = getConfString("hubot.adapter","org.dberg.hubot.adapter.ShellAdapter")
+    val c = Class.forName(a).getConstructor(this.getClass)
+    c.newInstance(this).asInstanceOf[BaseAdapter]
   }
 
   val middleware = {
-    getConfStringList("hubot.middleware").map({
-      case "test" => TestMiddleware
-      case x => logger.info("Sorry, uknown middleware in config " + x,"debug")
-    }).asInstanceOf[Seq[Middleware]]
+    getConfStringList("hubot.middleware").map({ m =>
+      logger.debug("Registering middleware " + m)
+      val c = Class.forName(m).getConstructor(this.getClass)
+      c.newInstance(this).asInstanceOf[Middleware]
+    })
   }
 
 

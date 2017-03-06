@@ -86,7 +86,7 @@ class TestListener2(hubot: Hubot ) extends Listener(hubot,"listen2") {
 
 class HelpListener(hubot: Hubot) extends Listener(hubot,"^help") {
 
-  val helpCommands = hubot.listeners.map(l => l.helpString).filter(l => l.isDefined)
+  lazy val helpCommands = hubot.listeners.flatMap(l => l.helpString)
 
   def runCallback(message: Message, groups: Seq[String]) = {
     logger.debug("Running help listener")
