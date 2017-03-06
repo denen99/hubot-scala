@@ -5,6 +5,10 @@ import com.typesafe.scalalogging.StrictLogging
 object HubotRunner extends StrictLogging {
 
   def main(args: Array[String]): Unit = {
+    start
+  }
+
+  def start = {
     val robot = new Hubot
 
     logger.debug("Found listeners " + robot.listeners)
