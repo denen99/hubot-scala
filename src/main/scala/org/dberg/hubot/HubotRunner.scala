@@ -10,7 +10,7 @@ object HubotRunner extends StrictLogging {
     logger.debug("Found listeners " + robot.listeners)
     logger.debug("Found middleware " + robot.middleware)
     logger.debug("Using adapter " + robot.adapter)
-    
+
     sys addShutdownHook {
       robot.brainService.shutdown
     }

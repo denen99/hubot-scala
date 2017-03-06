@@ -17,8 +17,7 @@ case class TestMiddleware() extends Middleware {
   def execute(message: Message) = {
     if (message.body == "blacklist") {
       Left(MiddlewareError("Sorry this is a blacklist"))
-    }
-    else {
+    } else {
       Right(MiddlewareSuccess())
     }
   }
