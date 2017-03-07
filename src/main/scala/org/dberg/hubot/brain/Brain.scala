@@ -4,7 +4,7 @@ import org.dberg.hubot.utils.Helpers._
 
 trait BrainComponent {
 
-  val brainService: BrainService
+  def brainService: BrainService
 
   class BrainService {
 

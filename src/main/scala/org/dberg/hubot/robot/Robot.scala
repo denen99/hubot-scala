@@ -8,10 +8,10 @@ import org.dberg.hubot.utils.Helpers._
 
 trait RobotComponent {
 
-  val robotService: RobotService
-  val adapter: BaseAdapter
-  val listeners: Seq[Listener]
-  val middleware: Seq[Middleware]
+  def robotService: RobotService
+  def adapter: BaseAdapter
+  def listeners: Seq[Listener]
+  def middleware: Seq[Middleware]
 
   class RobotService extends StrictLogging {
 
