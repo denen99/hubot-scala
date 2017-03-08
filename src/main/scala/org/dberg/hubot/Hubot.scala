@@ -7,11 +7,13 @@ import org.dberg.hubot.models._
 import org.dberg.hubot.robot.RobotComponent
 import org.dberg.hubot.utils.Helpers.{ getConfString, getConfStringList }
 import com.typesafe.scalalogging.StrictLogging
+import org.dberg.hubot.event.{ EventCallback, EventComponent }
 
-class Hubot extends RobotComponent with BrainComponent with StrictLogging {
+class Hubot extends RobotComponent with BrainComponent with EventComponent with StrictLogging {
 
   val robotService = new RobotService
   val brainService = new BrainService
+  val eventService = new EventService
 
   val listeners: Seq[Listener] = {
     getConfStringList("hubot.listeners").map({ l =>
@@ -34,6 +36,12 @@ class Hubot extends RobotComponent with BrainComponent with StrictLogging {
       c.newInstance(this).asInstanceOf[Middleware]
     })
   }
+
+  val eventCallbacks: Seq[EventCallback] = getConfStringList("hubot.eventCallbacks").map({ e =>
+    logger.debug("Registering event Callback " + e)
+    val c = Class.forName(e).getConstructor(this.getClass)
+    c.newInstance(this).asInstanceOf[EventCallback]
+  })
 
 }
 

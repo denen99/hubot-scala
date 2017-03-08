@@ -5,6 +5,8 @@ hubot {
 
   middleware = []
 
+  eventCallbacks = ["org.dberg.hubot.event.TestCallback"]
+
   adapter = "org.dberg.hubot.adapter.ShellAdapter"
 
   brain = "mapdb"

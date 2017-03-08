@@ -6,6 +6,7 @@ import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.Hubot
 import org.dberg.hubot.models.ListenerType.ListenerValue
 import org.dberg.hubot.utils.Helpers._
+import org.dberg.hubot.event.Event
 
 object ListenerType {
   sealed trait ListenerValue
@@ -21,6 +22,7 @@ abstract class Listener(
   val pattern = Pattern.compile(matcher)
   val robot = hubot.robotService
   val brain = hubot.brainService
+  val event = hubot.eventService
 
   def buildGroups(matcher: Matcher, count: Int, results: Seq[String] = Seq()): Seq[String] = count match {
     case 0 => results
@@ -63,6 +65,7 @@ class TestListener(hubot: Hubot) extends Listener(hubot, "listen1\\s+(.*)", List
     val resp = "scalabot heard you mention " + groups.head + " !, the last thing you said was " + lastMessage
     brain.set("lastmessage", message.body)
     logger.debug("Running callback for listener TestListener, sending response " + resp)
+    event.emit(Event("testid", Map("test" -> "value")))
     hubot.robotService.send(Message(message.user, resp, message.messageType))
   }
 
