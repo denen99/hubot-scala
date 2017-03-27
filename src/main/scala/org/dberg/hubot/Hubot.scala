@@ -8,6 +8,7 @@ import org.dberg.hubot.robot.RobotComponent
 import org.dberg.hubot.utils.Helpers.{ getConfString, getConfStringList }
 import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.event.{ EventCallback, EventComponent }
+import org.dberg.hubot.listeners.Listener
 
 class Hubot extends RobotComponent with BrainComponent with EventComponent with StrictLogging {
 

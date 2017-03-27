@@ -2,6 +2,7 @@ package org.dberg.hubot.robot
 
 import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.adapter.BaseAdapter
+import org.dberg.hubot.listeners.Listener
 import org.dberg.hubot.middleware.{ Middleware, MiddlewareError, MiddlewareSuccess }
 import org.dberg.hubot.models.{ Listener, Message }
 import org.dberg.hubot.utils.Helpers._

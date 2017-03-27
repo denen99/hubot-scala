@@ -1,7 +1,7 @@
 hubot {
   name = "scalabot"
 
-  listeners = ["org.dberg.hubot.models.TestListener", "org.dberg.hubot.models.TestListener2", "org.dberg.hubot.models.HelpListener"]
+  listeners = ["org.dberg.hubot.listeners.TestListener", "org.dberg.hubot.listeners.TestListener2", "org.dberg.hubot.listeners.HelpListener"]
 
   middleware = []
 
