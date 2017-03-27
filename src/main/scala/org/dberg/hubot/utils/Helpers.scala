@@ -40,15 +40,15 @@ object Helpers {
     case true => config.getStringList(key)
   }
 
-  def request(url: String, method: String = "GET", data: String = ""): HttpResponse = method.toUpperCase match {
+  def request(url: String, method: String = "GET", headers: Seq[(String, String)], data: String = ""): HttpResponse = method.toUpperCase match {
     case "GET" =>
-      val req = Http(url)
+      val req = Http(url).headers(headers)
       HttpResponse(req.asString.code, req.asString.headers, req.asString.body)
     case "POST" =>
-      val req = Http(url).postData(data)
+      val req = Http(url).headers(headers).postData(data)
       HttpResponse(req.asString.code, req.asString.headers, req.asString.body)
     case "PUT" =>
-      val req = Http(url).put(data)
+      val req = Http(url).headers(headers).put(data)
       HttpResponse(req.asString.code, req.asString.headers, req.asString.body)
     case "DELETE" =>
       val req = Http(url).postData(data).method("DELETE")
