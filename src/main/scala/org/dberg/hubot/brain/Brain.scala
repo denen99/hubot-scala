@@ -1,6 +1,8 @@
 package org.dberg.hubot.brain
 
 import org.dberg.hubot.utils.Helpers._
+import scodec.{ Codec ⇒ SCodec, _ }
+import scodec.codecs.implicits._
 
 trait BrainComponent {
 
@@ -15,9 +17,10 @@ trait BrainComponent {
       }
     }
 
-    def set(key: String, value: String) = backend.setKey(key, value)
+    def set[A: SCodec](key: String, value: A) =
+      backend.setKey[A](key, value)
 
-    def get(key: String) = backend.getKey(key)
+    def get[A: SCodec](key: String) = backend.getKey[A](key)
 
     def shutdown = backend.shutdown()
 

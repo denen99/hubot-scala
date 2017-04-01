@@ -1,7 +1,7 @@
 lazy val root = (project in file(".")).
   settings(
     name := "hubot-scala",
-    version := "0.1.2",
+    version := "0.1.3",
     scalaVersion := "2.11.8",
     retrieveManaged := true,
     libraryDependencies ++= Seq(
@@ -13,7 +13,6 @@ lazy val root = (project in file(".")).
       "ch.qos.logback" % "logback-classic" % "1.1.9" ,
       "org.igniterealtime.smack" % "smack-core" % "4.1.9",
       "org.igniterealtime.smack" % "smack-tcp" % "4.1.9",
-//      "org.igniterealtime.smack" % "smackx" % "3.2.1",
       "org.igniterealtime.smack" % "smack-im" % "4.1.9",
       "org.igniterealtime.smack" % "smack-sasl-provided" % "4.1.9",
       "org.igniterealtime.smack" % "smack-java7" % "4.1.9",
@@ -21,7 +20,8 @@ lazy val root = (project in file(".")).
       "org.mapdb" % "mapdb" % "3.0.2",
       "org.scalaj" %% "scalaj-http" % "2.3.0",
       "org.json4s" %% "json4s-jackson" % "3.5.1",
-      "dnsjava" % "dnsjava" % "2.1.8"
+      "org.scodec" %% "scodec-core" % "1.8.3",
+      "org.scodec" %% "scodec-bits" % "1.0.11"
     )
 )
 

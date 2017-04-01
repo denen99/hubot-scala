@@ -7,9 +7,9 @@ import org.dberg.hubot.models.Message
 class TestListener(hubot: Hubot) extends Listener(hubot, "listen1\\s+(.*)", ListenerType.Hear) {
 
   def runCallback(message: Message, groups: Seq[String]) = {
-    val lastMessage = brain.get("lastmessage")
+    val lastMessage = brain.get[String]("lastmessage")
     val resp = "scalabot heard you mention " + groups.head + " !, the last thing you said was " + lastMessage
-    brain.set("lastmessage", message.body)
+    brain.set[String]("lastmessage", message.body)
     logger.debug("Running callback for listener TestListener, sending response " + resp)
     event.emit(Event("testid", Map("test" -> "value")))
     hubot.robotService.send(Message(message.user, resp, message.messageType))
