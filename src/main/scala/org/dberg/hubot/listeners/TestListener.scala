@@ -3,7 +3,6 @@ package org.dberg.hubot.listeners
 import org.dberg.hubot.Hubot
 import org.dberg.hubot.event.Event
 import org.dberg.hubot.models.Message
-import scodec.codecs.implicits._
 
 class TestListener(hubot: Hubot) extends Listener(hubot, "listen1\\s+(.*)", ListenerType.Hear) {
 

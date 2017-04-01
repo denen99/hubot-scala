@@ -31,7 +31,11 @@ trait RobotComponent {
     def processListeners(message: Message) = {
       listeners.foreach { l =>
         logger.debug("Processing message through listener " + l.toString)
-        l.call(message)
+        try {
+          l.call(message)
+        } catch {
+          case e: Exception => logger.error("Error running listener " + e.getMessage)
+        }
       }
     }
 

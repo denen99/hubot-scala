@@ -7,12 +7,13 @@ import org.dberg.hubot.Hubot
 import org.dberg.hubot.listeners.ListenerType.ListenerValue
 import org.dberg.hubot.models.Message
 import org.dberg.hubot.utils.Helpers._
+import scodec.codecs.ImplicitCodecs
 
 abstract class Listener(
     val hubot: Hubot,
     matcher: String,
     listenerType: ListenerValue = ListenerType.Respond
-) extends StrictLogging {
+) extends StrictLogging with ImplicitCodecs {
   val pattern = Pattern.compile(matcher)
   val robot = hubot.robotService
   val brain = hubot.brainService
