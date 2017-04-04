@@ -4,8 +4,6 @@ import org.dberg.hubot.Hubot
 import org.dberg.hubot.event.Event
 import org.dberg.hubot.models.Message
 
-import scala.util.{ Failure, Success, Try }
-
 class TestListener(hubot: Hubot) extends Listener(hubot, "listen1\\s+(.*)", ListenerType.Hear) {
 
   def runCallback(message: Message, groups: Seq[String]) = {
