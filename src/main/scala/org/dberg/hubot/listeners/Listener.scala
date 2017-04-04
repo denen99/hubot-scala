@@ -20,7 +20,7 @@ abstract class Listener(
   val event = hubot.eventService
 
   def buildGroups(matcher: Matcher, count: Int, results: Seq[String] = Seq()): Seq[String] = count match {
-    case 0 => results
+    case 0 => results.reverse
     case x => buildGroups(matcher, count - 1, results :+ matcher.group(count))
   }
 
@@ -41,7 +41,6 @@ abstract class Listener(
   }
 
   def shouldRespond(message: Message): Boolean = {
-    println(s"message $message $listenerType ${message.body} $robot.hubotName")
     listenerType == ListenerType.Hear || (listenerType == ListenerType.Respond && message.body.addressedToHubot(message, robot.hubotName))
   }
 

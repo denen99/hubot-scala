@@ -45,12 +45,13 @@ trait RobotComponent {
       logger.debug("Received message " + message)
       //Loop through middleware, halting if need be
       //then send to each listener
-      processMiddleware(message) match {
+      val cleanMessage = message.copy(body = message.body.trim)
+      processMiddleware(cleanMessage) match {
         case Left(x) =>
           logger.error("Sorry, middleware error " + x.error)
         case Right(_) =>
           logger.debug("Middleware passed")
-          processListeners(message)
+          processListeners(cleanMessage)
       }
     }
 
