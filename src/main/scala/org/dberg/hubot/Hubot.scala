@@ -17,11 +17,11 @@ class Hubot extends RobotComponent with BrainComponent with EventComponent with 
   val eventService = new EventService
 
   val listeners: Seq[Listener] = {
-    getConfStringList("hubot.listeners").map({ l =>
+    ("org.dberg.hubot.listeners.HelpListener" +: getConfStringList("hubot.listeners")).map({ l =>
       logger.debug("Registering listener " + l)
       val c = Class.forName(l).getConstructor(this.getClass)
       c.newInstance(this).asInstanceOf[Listener]
-    }) :+ new org.dberg.hubot.listeners.HelpListener(this)
+    })
   }
 
   val adapter: BaseAdapter = {
