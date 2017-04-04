@@ -2,8 +2,10 @@ package org.dberg.hubot.brain
 
 import org.mapdb._
 import org.dberg.hubot.utils.Helpers._
-import scodec.{ Codec ⇒ SCodec, _ }
+import scodec.{ Codec => SCodec, _ }
 import scodec.codecs.implicits._
+
+import scala.util.Try
 
 object MapdbBackend extends BrainBackendBase {
 
@@ -11,11 +13,10 @@ object MapdbBackend extends BrainBackendBase {
   private val db = DBMaker.fileDB(dbFile).make()
   private val dbHash = db.hashMap("hubot", Serializer.STRING, Serializer.BYTE_ARRAY).createOrOpen()
 
-  def setKey[A: SCodec](key: String, value: A) = {
-    dbHash.put(key, encode(value))
-  }
+  def setKey[A: SCodec](key: String, value: A) =
+    dbHash.put(key, encode(value).getOrElse(Array()))
 
-  def getKey[A: SCodec](key: String) = {
+  def getKey[A: SCodec](key: String): Try[A] = {
     val result = dbHash.get(key)
     decode[A](result)
   }
