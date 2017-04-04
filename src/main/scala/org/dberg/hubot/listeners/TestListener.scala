@@ -12,7 +12,7 @@ class TestListener(hubot: Hubot) extends Listener(hubot, "listen1\\s+(.*)", List
     brain.set[String]("lastmessage", message.body)
     logger.debug("Running callback for listener TestListener, sending response " + resp)
     event.emit(Event("testid", Map("test" -> "value")))
-    hubot.robotService.send(Message(message.user, resp, message.messageType))
+    robot.send(Message(message.user, resp, message.messageType))
   }
 
   val helpString = Some("listen1 -> Responds to anything and repeats it ")
