@@ -12,8 +12,13 @@ import org.dberg.hubot.listeners.Listener
 
 class Hubot extends RobotComponent with BrainComponent with EventComponent with StrictLogging {
 
+  logger.debug("Creating Robot Service")
   val robotService = new RobotService
+
+  logger.debug("Creating Brain Service")
   val brainService = new BrainService
+
+  logger.debug("Creating Event Service")
   val eventService = new EventService
 
   val listeners: Seq[Listener] = {

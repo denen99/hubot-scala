@@ -1,7 +1,7 @@
 lazy val root = (project in file(".")).
   settings(
     name := "hubot-scala",
-    version := "0.1.6",
+    version := "0.1.7",
     scalaVersion := "2.11.8",
     retrieveManaged := true,
     libraryDependencies ++= Seq(
