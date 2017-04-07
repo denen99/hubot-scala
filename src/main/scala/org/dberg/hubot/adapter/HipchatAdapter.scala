@@ -46,10 +46,11 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
     class ChatListener extends ChatMessageListener with StrictLogging {
 
       def processMessage(chat: Chat, msg: SmackMessage) = {
+        logger.debug("Received message " + msg.toString)
         if (msg.getBody != null) {
           val jid = getJid(msg.getFrom)
           val user = User(jid)
-          hubot.robotService.receive(HubotMessage(user, msg.getBody, MessageType.DirectMessage))
+          robot.receive(HubotMessage(user, msg.getBody, MessageType.DirectMessage))
         }
       }
     }
@@ -124,13 +125,19 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
           val jid = getJid(message.getFrom)
           val user = User(jid)
           //Dont process messages if the bot sent them to avoid loops !
+          //TODO:  This should be made generic for any adapter or future adapters are screwed !
           if (getPresence(message.getFrom) != chatAlias)
-            hubot.robotService.receive(HubotMessage(user, message.getBody, MessageType.GroupMessage))
+            robot.receive(HubotMessage(user, message.getBody, MessageType.GroupMessage))
         }
       }
 
     }
 
+    /**
+     * ****************************************
+     * Callback for GroupChat Invites
+     * *****************************************
+     */
     class MucInvitationListener extends InvitationListener {
       override def invitationReceived(conn: XMPPConnection, room: MultiUserChat, inviter: String, reason: String, password: String, message: SmackMessage) = {
         logger.debug("Received invite to room " + room.getRoom)
