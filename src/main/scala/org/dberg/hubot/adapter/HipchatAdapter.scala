@@ -2,16 +2,19 @@ package org.dberg.hubot.adapter
 
 import java.util.regex.Pattern
 import javax.net.ssl.{ HostnameVerifier, SSLSession }
+
 import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.Hubot
+
 import collection.JavaConverters._
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.chat.{ Chat, ChatManager, ChatManagerListener, ChatMessageListener }
-import org.jivesoftware.smackx.muc.{ DiscussionHistory, MultiUserChat, MultiUserChatManager, RoomInfo }
+import org.jivesoftware.smackx.muc._
 import org.jivesoftware.smack.tcp.{ XMPPTCPConnection, XMPPTCPConnectionConfiguration }
 import org.dberg.hubot.models.{ MessageType, User, Message => HubotMessage }
 import org.dberg.hubot.utils.Helpers._
 import org.jivesoftware.smack.packet.{ Presence, Stanza, Message => SmackMessage }
+import org.jivesoftware.smackx.ping.{ PingFailedListener, PingManager }
 
 class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with StrictLogging {
 
@@ -43,12 +46,11 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
     class ChatListener extends ChatMessageListener with StrictLogging {
 
       def processMessage(chat: Chat, msg: SmackMessage) = {
-        logger.debug("chat: " + chat.toString)
-        logger.debug("msg: " + msg.toString)
+        logger.debug("Received message " + msg.toString)
         if (msg.getBody != null) {
           val jid = getJid(msg.getFrom)
           val user = User(jid)
-          hubot.robotService.receive(HubotMessage(user, msg.getBody, MessageType.DirectMessage))
+          robot.receive(HubotMessage(user, msg.getBody, MessageType.DirectMessage))
         }
       }
     }
@@ -78,11 +80,23 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
         onClose()
       }
 
-      def connectionClosed =
+      def connectionClosed = {
         logger.debug("Error, connection closed")
+        onClose()
+      }
 
       def reconnectingIn(seconds: Int) =
         logger.debug("Reconnecting in " + seconds.toString + " seconds")
+    }
+
+    /**
+     * ***************************
+     * Callback for Ping Failures
+     * ********************************
+     */
+    class PingMgrListener extends PingFailedListener {
+      def pingFailed() =
+        logger.debug("XMPP Ping Failed")
     }
 
     /**
@@ -111,11 +125,33 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
           val jid = getJid(message.getFrom)
           val user = User(jid)
           //Dont process messages if the bot sent them to avoid loops !
+          //TODO:  This should be made generic for any adapter or future adapters are screwed !
           if (getPresence(message.getFrom) != chatAlias)
-            hubot.robotService.receive(HubotMessage(user, message.getBody, MessageType.GroupMessage))
+            robot.receive(HubotMessage(user, message.getBody, MessageType.GroupMessage))
         }
       }
 
+    }
+
+    /**
+     * ****************************************
+     * Callback for GroupChat Invites
+     * *****************************************
+     */
+    class MucInvitationListener extends InvitationListener {
+      override def invitationReceived(conn: XMPPConnection, room: MultiUserChat, inviter: String, reason: String, password: String, message: SmackMessage) = {
+        logger.debug("Received invite to room " + room.getRoom)
+        val history = new DiscussionHistory()
+        history.setMaxStanzas(0)
+        val muc = mucMgr.getMultiUserChat(room.getRoom)
+        muc.addMessageListener(new MessageMgrListener)
+        try {
+          muc.join(chatAlias, null, history, SmackConfiguration.getDefaultPacketReplyTimeout)
+        } catch {
+          case e: Exception =>
+            logger.error("Unable to join via invite, MUC room " + muc.getRoom + ": ", e)
+        }
+      }
     }
 
   }
@@ -123,12 +159,19 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
   import HipchatAdapterTools._
 
   def run() = {
+    logger.debug("Starting HipChat Run loop")
     conn.addConnectionListener(connectListener)
-    if (!conn.isConnected)
+    if (!conn.isConnected) {
+      logger.debug("XMPP connection is connnected")
       conn.connect()
-    if (!conn.isAuthenticated)
+    }
+    if (!conn.isAuthenticated) {
+      logger.debug("XMPP connection is not authenticated, logging in")
       conn.login()
+    }
     if (conn.isAuthenticated) {
+
+      pingMgr.pingMyServer(true) // Just a test
 
       mucMgr.getHostedRooms("conf.hipchat.com").asScala.foreach { room =>
         val muc = mucMgr.getMultiUserChat(room.getJid)
@@ -148,7 +191,7 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
       }
       logger.error("Error - disconnected from server, reconnecting")
       run()
-    }
+    } else { logger.error("XMPP COnnection is not authenticated") }
   }
 
   def send(message: HubotMessage) = {
@@ -181,12 +224,22 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
     .setHostnameVerifier(verify)
     .setUsernameAndPassword(jid, password)
     .setSecurityMode(ConnectionConfiguration.SecurityMode.required)
+    .setConnectTimeout(30000)
 
   val conn = new XMPPTCPConnection(conf.build())
+
+  val reconnectMgr = ReconnectionManager.getInstanceFor(conn)
+  reconnectMgr.enableAutomaticReconnection()
+
+  val pingMgr = PingManager.getInstanceFor(conn)
+  pingMgr.setPingInterval(10)
+  pingMgr.registerPingFailedListener(new PingMgrListener)
+
   val chatMgr = ChatManager.getInstanceFor(conn)
   chatMgr.addChatListener(new ChatMgrListener)
 
   val mucMgr = MultiUserChatManager.getInstanceFor(conn)
+  mucMgr.addInvitationListener(new MucInvitationListener)
 
   val connectListener = new ConnectListener(conn)(run)
 
