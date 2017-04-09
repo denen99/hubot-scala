@@ -25,6 +25,7 @@ object MapdbBackend extends BrainBackendBase with StrictLogging {
   }
 
   def shutdown() = {
+    logger.info("Shutting down MapDB")
     dbHash.close()
     db.close()
   }

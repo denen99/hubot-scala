@@ -40,7 +40,7 @@ class Hubot extends RobotComponent with BrainComponent with EventComponent with 
       logger.debug("Registering middleware " + m)
       val c = Class.forName(m).getConstructor(this.getClass)
       c.newInstance(this).asInstanceOf[Middleware]
-    })
+    }).toList
   }
 
   val eventCallbacks: Seq[EventCallback] = getConfStringList("hubot.eventCallbacks").map({ e =>

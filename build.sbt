@@ -6,7 +6,8 @@ lazy val root = (project in file(".")).
     retrieveManaged := true,
     libraryDependencies ++= Seq(
       "com.typesafe" % "config" % "1.3.0",
-      "org.specs2" %% "specs2-core" % "3.7" % "test",
+      "org.scalatest" % "scalatest_2.11" % "3.0.1" % "test",
+      "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test,  
       "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
       "org.slf4j" % "slf4j-api" % "1.7.22",
       "org.slf4j" % "log4j-over-slf4j" % "1.7.22",  // for any java classes looking for this
@@ -24,6 +25,10 @@ lazy val root = (project in file(".")).
       "org.scodec" %% "scodec-bits" % "1.0.11"
     )
 )
+
+fork in Test := true // allow to apply extra setting to Test
+
+javaOptions in Test += "-Dconfig.resource=application.test.conf"
 
 organization := "org.dberg"
 
