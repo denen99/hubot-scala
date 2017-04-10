@@ -4,7 +4,7 @@ import org.scalatest.DoNotDiscover
 import scodec.codecs.ImplicitCodecs
 
 @DoNotDiscover
-class BrainSpec extends SpecBase with ImplicitCodecs {
+class BrainTestSuite extends SpecBase with ImplicitCodecs {
 
   "Hubot Brain" should "set a string correctly" in {
     brain.set[String]("testkey", "testvalue")
