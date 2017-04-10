@@ -7,7 +7,7 @@ import org.dberg.hubot.models.Message
 class SpecMiddleware(hubot: Hubot) extends Middleware(hubot) with StrictLogging {
 
   def execute(message: Message) = {
-    if (message.body == "blacklist") {
+    if (message.body.contains("blacklist")) {
       Left(MiddlewareError("Sorry this is blocked"))
     } else {
       Right(MiddlewareSuccess())
