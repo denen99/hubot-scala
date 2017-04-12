@@ -3,14 +3,14 @@ package org.dberg.hubot.listeners
 import java.util.regex.{ Matcher, Pattern }
 
 import com.typesafe.scalalogging.StrictLogging
-import org.dberg.hubot.Hubot
+import org.dberg.hubot.{ Hubot, HubotBase }
 import org.dberg.hubot.listeners.ListenerType.ListenerValue
 import org.dberg.hubot.models.Message
 import org.dberg.hubot.utils.Helpers._
 import scodec.codecs.ImplicitCodecs
 
 abstract class Listener(
-    val hubot: Hubot,
+    val hubot: HubotBase,
     matcher: String,
     listenerType: ListenerValue = ListenerType.Respond
 ) extends StrictLogging with ImplicitCodecs {

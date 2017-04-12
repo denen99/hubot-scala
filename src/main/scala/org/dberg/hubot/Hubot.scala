@@ -4,13 +4,24 @@ import org.dberg.hubot.adapter.{ BaseAdapter, HipchatAdapter, ShellAdapter }
 import org.dberg.hubot.brain.BrainComponent
 import org.dberg.hubot.middleware.{ Middleware, MiddlewareError, MiddlewareSuccess, TestMiddleware }
 import org.dberg.hubot.models._
-import org.dberg.hubot.robot.RobotComponent
 import org.dberg.hubot.utils.Helpers.{ getConfString, getConfStringList }
 import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.event.{ EventCallback, EventComponent }
 import org.dberg.hubot.listeners.Listener
+import org.dberg.hubot.robot.RobotComponent
 
-class Hubot extends RobotComponent with BrainComponent with EventComponent with StrictLogging {
+trait HubotBase extends RobotComponent with BrainComponent with EventComponent {
+  def robotService: RobotService
+  def brainService: BrainService
+  def eventService: EventService
+
+  def listeners: Seq[Listener]
+  def middleware: List[Middleware]
+  def adapter: BaseAdapter
+  def eventCallbacks: Seq[EventCallback]
+}
+
+class Hubot extends HubotBase with StrictLogging {
 
   logger.debug("Creating Robot Service")
   val robotService = new RobotService

@@ -6,7 +6,7 @@ lazy val root = (project in file(".")).
     retrieveManaged := true,
     libraryDependencies ++= Seq(
       "com.typesafe" % "config" % "1.3.0",
-      "org.scalatest" % "scalatest_2.11" % "3.0.1" % "test",
+      "org.scalatest" %% "scalatest" % "3.0.1" % Test,
       "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test,  
       "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
       "org.slf4j" % "slf4j-api" % "1.7.22",

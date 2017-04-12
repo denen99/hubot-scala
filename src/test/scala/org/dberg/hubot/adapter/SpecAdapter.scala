@@ -1,9 +1,9 @@
 package org.dberg.hubot.adapter
 
-import org.dberg.hubot.Hubot
+import org.dberg.hubot.{ Hubot, HubotBase }
 import org.dberg.hubot.models.{ Message, MessageType, User }
 
-class SpecAdapter(hubot: Hubot) extends BaseAdapter(hubot) {
+class SpecAdapter(hubot: HubotBase) extends BaseAdapter(hubot) {
 
   def send(message: Message) =
     println(message.body)

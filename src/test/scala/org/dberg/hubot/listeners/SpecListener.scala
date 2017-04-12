@@ -1,9 +1,9 @@
 package org.dberg.hubot.listeners
 
-import org.dberg.hubot.Hubot
+import org.dberg.hubot.{ Hubot, HubotBase }
 import org.dberg.hubot.models.Message
 
-class SpecListener(hubot: Hubot) extends Listener(hubot, "spectest") {
+class SpecListener(hubot: HubotBase) extends Listener(hubot, "spectest\\s*(.*)") {
 
   val helpString = Some("this is a spec helper")
 

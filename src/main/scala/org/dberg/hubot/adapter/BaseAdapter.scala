@@ -1,10 +1,10 @@
 package org.dberg.hubot.adapter
 
 import com.typesafe.scalalogging.StrictLogging
-import org.dberg.hubot.Hubot
+import org.dberg.hubot.{ Hubot, HubotBase }
 import org.dberg.hubot.models.{ Message, MessageType, User }
 
-abstract class BaseAdapter(val hubot: Hubot) extends StrictLogging {
+abstract class BaseAdapter(val hubot: HubotBase) extends StrictLogging {
 
   val robot = hubot.robotService
   val brain = hubot.brainService
