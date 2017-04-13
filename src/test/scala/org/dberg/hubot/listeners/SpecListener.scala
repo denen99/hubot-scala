@@ -8,6 +8,7 @@ class SpecListener(hubot: HubotBase) extends Listener(hubot, "spectest\\s*(.*)")
   val helpString = Some("this is a spec helper")
 
   override def runCallback(message: Message, groups: Seq[String]): Unit = {
+    logger.debug("running spec listener callback")
     brain.set[String]("lastmessage", message.body)
     logger.info("Spec running listener callback")
   }
