@@ -21,12 +21,8 @@ class ListenerTestSuite extends SpecBase {
   val failureMessage = Message(User("specuser"), "spectest failure", DirectMessage)
 
   "A listener" should "receive the matched regex groups" in {
-    //val mockedHubot = new MockedHubot
     val param = "param1"
-    //expect the message to be sent to the adapter and listener
     (hubot.adapter.send _).expects(generateListenerResponse(matchedMessage2, param))
-
-    //Receive the message and the listener should get called, returning Success
     assert(hubot.robotService.receive(matchedMessage2) == Seq(CallbackSuccess))
   }
 
