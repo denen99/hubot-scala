@@ -7,7 +7,7 @@ class HelpListener(hubot: Hubot) extends Listener(hubot, "^help\\s*(.*)") {
 
   lazy val helpCommands = hubot.listeners.flatMap(l => l.helpString)
 
-  def runCallback(message: Message, groups: Seq[String]) = {
+  def runCallback(message: Message, groups: List[String]) = {
     logger.debug("Running help listener")
 
     lazy val commands = if (groups.nonEmpty)

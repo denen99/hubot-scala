@@ -42,6 +42,7 @@ class Hubot extends HubotBase with StrictLogging {
 
   val adapter: BaseAdapter = {
     val a = getConfString("hubot.adapter", "org.dberg.hubot.adapter.ShellAdapter")
+    logger.debug("Registering adapter " + a)
     val c = Class.forName(a).getConstructor(this.getClass)
     c.newInstance(this).asInstanceOf[BaseAdapter]
   }

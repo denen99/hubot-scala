@@ -37,7 +37,7 @@ trait RobotComponent {
         try {
           l.call(message)
         } catch {
-          case e: Exception => logger.error("Error running listener " + e.getMessage)
+          case e: Exception => logger.error("Error running listener " + e.printStackTrace)
         }
       }
     }

@@ -19,9 +19,9 @@ abstract class Listener(
   val brain = hubot.brainService
   val event = hubot.eventService
 
-  def buildGroups(matcher: Matcher, count: Int, results: Seq[String] = Seq()): Seq[String] = count match {
+  private def buildGroups(matcher: Matcher, count: Int, results: List[String] = List()): List[String] = count match {
     case 0 => results.reverse
-    case x => buildGroups(matcher, count - 1, results :+ matcher.group(count))
+    case _ => buildGroups(matcher, count - 1, results :+ matcher.group(count))
   }
 
   def call(message: Message): Unit = {
@@ -40,11 +40,12 @@ abstract class Listener(
     }
   }
 
-  def shouldRespond(message: Message): Boolean = {
-    listenerType == ListenerType.Hear || (listenerType == ListenerType.Respond && message.body.addressedToHubot(message, robot.hubotName))
+  private def shouldRespond(message: Message): Boolean = {
+    listenerType == ListenerType.Hear ||
+      (listenerType == ListenerType.Respond && message.body.addressedToHubot(message, robot.hubotName))
   }
 
-  def runCallback(message: Message, groups: Seq[String]): Unit
+  def runCallback(message: Message, groups: List[String]): Unit
 
   def helpString: Option[String]
 }

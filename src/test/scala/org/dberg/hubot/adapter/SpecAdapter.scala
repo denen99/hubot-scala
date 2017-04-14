@@ -1,24 +1,11 @@
 package org.dberg.hubot.adapter
 
-import org.dberg.hubot.{ Hubot, HubotBase }
+import org.dberg.hubot.HubotBase
 import org.dberg.hubot.models.{ Message, MessageType, User }
 
 class SpecAdapter(hubot: HubotBase) extends BaseAdapter(hubot) {
 
-  def send(message: Message) =
-    println(message.body)
+  def send(message: Message) = {}
 
-  def run() = {
-    logger.info("Running adapter " + this.getClass.getName)
-
-    while (true) {
-      print(robot.hubotName + " >")
-      Option(scala.io.StdIn.readLine())
-        .map(_.trim)
-        .filter(_.nonEmpty)
-        .foreach { resp =>
-          robot.receive(Message(User("adam"), resp, MessageType.GroupMessage))
-        }
-    }
-  }
+  def run() = {}
 }
