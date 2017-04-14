@@ -1,16 +1,19 @@
 package org.dberg.hubot
 
 import org.dberg.hubot.adapter.SpecAdapter
+import org.dberg.hubot.SpecHelpers._
 import org.dberg.hubot.listeners.{ Listener, SpecListener }
 import org.dberg.hubot.middleware.{ Middleware, SpecMiddleware }
 import org.dberg.hubot.models.{ Message, User }
-import org.dberg.hubot.models.MessageType.DirectMessage
+import org.dberg.hubot.models.MessageType.{ DirectMessage, GroupMessage }
 import org.scalatest.DoNotDiscover
 
 @DoNotDiscover
 class ListenerTestSuite extends SpecBase {
 
   val matchedMessage1 = Message(User("specuser"), "spectest", DirectMessage)
+  val matchedMessage2 = Message(User("specuser"), "spectest param1", DirectMessage)
+  val blacklistMessage = Message(User("specuser"), "spectest blacklist", DirectMessage)
 
   class MockedHubot extends HubotBase {
 
@@ -32,19 +35,19 @@ class ListenerTestSuite extends SpecBase {
 
   "A listener" should "receive the matched regex groups" in {
     val mockedHubot = new MockedHubot
-    val responseMessage1 = Message(User("specuser"), "received", DirectMessage)
     val param = "param1"
     //expect the message to be sent to the adapter and listener 
-    (mockedHubot.adapter.send _).expects(responseMessage1.copy(body = responseMessage1.body + " " + param))
-    (mockedHubot.mockListener.call _).expects(matchedMessage1.copy(body = matchedMessage1.body + " " + param))
+    (mockedHubot.mockListener.call _).expects(matchedMessage2)
+    (mockedHubot.adapter.send _).expects(generateListenerResponse(matchedMessage2, param))
+
     //Receive the message and the listener should get called
-    mockedHubot.robotService.receive(matchedMessage1.copy(body = matchedMessage1.body + " " + param))
+    mockedHubot.robotService.receive(matchedMessage2)
   }
 
-  "A listener" should "get triggered when the regex matches" in {
+  "A listener" should "get triggered when the regex matches a DirectMessage" in {
     val mockedHubot = new MockedHubot
-    val responseMessage1 = Message(User("specuser"), "received", DirectMessage)
-    (mockedHubot.adapter.send _).expects(responseMessage1)
+    val param = ""
+    (mockedHubot.adapter.send _).expects(generateListenerResponse(matchedMessage1, param))
     (mockedHubot.mockListener.call _).expects(matchedMessage1)
     mockedHubot.robotService.receive(matchedMessage1)
   }
@@ -53,6 +56,17 @@ class ListenerTestSuite extends SpecBase {
     val mockedHubot = new MockedHubot
     (mockedHubot.adapter.send _).expects(*).never()
     (mockedHubot.mockListener.call _).expects(*).never()
-    mockedHubot.robotService.receive(matchedMessage1.copy(body = matchedMessage1.body + " blacklist"))
+    mockedHubot.robotService.receive(blacklistMessage)
   }
+
+  "A listener" should "respond if its a GroupMessage and addressed to hubot" in {
+    val mockedHubot = new MockedHubot
+    val message = matchedMessage1.copy(body = mockedHubot.robotService.hubotName + " " + matchedMessage1.body, messageType = GroupMessage)
+    val param = ""
+    val resp = generateListenerResponse(message, param)
+    (mockedHubot.adapter.send _).expects(resp)
+    (mockedHubot.mockListener.call _).expects(message)
+    mockedHubot.robotService.receive(message)
+  }
+
 }
