@@ -20,6 +20,7 @@ class HubotTestSuite extends SpecBase {
 
   "Hubot" should "receive a valid message" in {
     val message = "spectest message test"
+    (hubot.adapter.send _).expects(Message(User("specuser"), "received message test", DirectMessage))
     robot.receive(Message(User("spec"), message, DirectMessage))
     val last = brain.get[String]("lastmessage").getOrElse("")
     assert(last == message)

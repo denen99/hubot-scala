@@ -16,13 +16,14 @@ abstract class SpecBase extends FlatSpec with Matchers with MockFactory with Bef
 
   class TestHubot extends HubotBase {
 
+    class MockedAdapter extends SpecAdapter(this)
     val brainService = new BrainService
     val robotService = new RobotService
     val eventService = new EventService
 
     val listeners: Seq[Listener] = Seq(new SpecListener(this))
     val middleware: List[Middleware] = List(new SpecMiddleware(this))
-    val adapter = new SpecAdapter(this)
+    val adapter = mock[MockedAdapter]
 
     val eventCallbacks = Seq()
   }

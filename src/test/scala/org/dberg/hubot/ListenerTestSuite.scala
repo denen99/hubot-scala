@@ -34,7 +34,7 @@ class ListenerTestSuite extends SpecBase {
     val mockedHubot = new MockedHubot
     val responseMessage1 = Message(User("specuser"), "received", DirectMessage)
     val param = "param1"
-    //expect the message to be sent to the adapter
+    //expect the message to be sent to the adapter and listener 
     (mockedHubot.adapter.send _).expects(responseMessage1.copy(body = responseMessage1.body + " " + param))
     (mockedHubot.mockListener.call _).expects(matchedMessage1.copy(body = matchedMessage1.body + " " + param))
     //Receive the message and the listener should get called
@@ -51,7 +51,6 @@ class ListenerTestSuite extends SpecBase {
 
   "A listener" should "not run if the middleware blocks it" in {
     val mockedHubot = new MockedHubot
-
     (mockedHubot.adapter.send _).expects(*).never()
     (mockedHubot.mockListener.call _).expects(*).never()
     mockedHubot.robotService.receive(matchedMessage1.copy(body = matchedMessage1.body + " blacklist"))
