@@ -1,11 +1,9 @@
 package org.dberg.hubot.listeners
 
-import org.dberg.hubot.{ Hubot, HubotBase }
-import org.dberg.hubot.models.{ Message, User }
+import org.dberg.hubot.HubotBase
+import org.dberg.hubot.models.Message
 import org.dberg.hubot.SpecHelpers._
 import org.dberg.hubot.listeners.Listener.{ CallbackFailure, CallbackSuccess }
-
-import scala.util.control.NonFatal
 
 class SpecListener(hubot: HubotBase) extends Listener(hubot, "spectest\\s*(.*)") {
 

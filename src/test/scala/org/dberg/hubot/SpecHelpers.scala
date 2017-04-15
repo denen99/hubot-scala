@@ -1,6 +1,6 @@
 package org.dberg.hubot
 
-import org.dberg.hubot.models.{ Message, User }
+import org.dberg.hubot.models.Message
 
 object SpecHelpers {
 

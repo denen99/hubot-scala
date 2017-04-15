@@ -1,10 +1,7 @@
 package org.dberg.hubot
 
-import org.dberg.hubot.adapter.SpecAdapter
 import org.dberg.hubot.SpecHelpers._
 import org.dberg.hubot.listeners.Listener._
-import org.dberg.hubot.listeners.{ Listener, SpecListener }
-import org.dberg.hubot.middleware.{ Middleware, SpecMiddleware }
 import org.dberg.hubot.models.{ Message, User }
 import org.dberg.hubot.models.MessageType.{ DirectMessage, GroupMessage }
 import org.scalatest.DoNotDiscover

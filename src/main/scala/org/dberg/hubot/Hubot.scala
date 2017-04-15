@@ -37,26 +37,26 @@ class Hubot extends HubotBase with StrictLogging {
       logger.debug("Registering listener " + l)
       val c = Class.forName(l).getConstructor(this.getClass)
       c.newInstance(this).asInstanceOf[Listener]
-    })
+    }).distinct
   }
 
   val adapter: BaseAdapter = {
     val a = getConfString("hubot.adapter", "org.dberg.hubot.adapter.ShellAdapter")
-    logger.debug("Registering adapter " + a)
+    logger.info("Registering adapter " + a)
     val c = Class.forName(a).getConstructor(this.getClass)
     c.newInstance(this).asInstanceOf[BaseAdapter]
   }
 
   val middleware = {
     getConfStringList("hubot.middleware").map({ m =>
-      logger.debug("Registering middleware " + m)
+      logger.info("Registering middleware " + m)
       val c = Class.forName(m).getConstructor(this.getClass)
       c.newInstance(this).asInstanceOf[Middleware]
     }).toList
   }
 
   val eventCallbacks: Seq[EventCallback] = getConfStringList("hubot.eventCallbacks").map({ e =>
-    logger.debug("Registering event Callback " + e)
+    logger.info("Registering event Callback " + e)
     val c = Class.forName(e).getConstructor(this.getClass)
     c.newInstance(this).asInstanceOf[EventCallback]
   })

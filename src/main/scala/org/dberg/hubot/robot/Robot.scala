@@ -8,6 +8,7 @@ import org.dberg.hubot.middleware.{ Middleware, MiddlewareError, MiddlewareSucce
 import org.dberg.hubot.models.Message
 import org.dberg.hubot.utils.Helpers._
 
+import scala.annotation.tailrec
 import scala.util.control.NonFatal
 
 trait RobotComponent {
@@ -19,6 +20,7 @@ trait RobotComponent {
 
   class RobotService extends StrictLogging {
 
+    @tailrec
     private def processMiddlewareRec(
       message: Message,
       m: List[Middleware],

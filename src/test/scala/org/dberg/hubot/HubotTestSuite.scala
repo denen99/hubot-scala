@@ -4,7 +4,7 @@ import org.dberg.hubot.SpecHelpers._
 import org.dberg.hubot.middleware.MiddlewareError
 import org.dberg.hubot.models.{ Message, User }
 import org.dberg.hubot.models.MessageType._
-import org.scalatest.{ BeforeAndAfterAll, DoNotDiscover, Suites }
+import org.scalatest.DoNotDiscover
 
 @DoNotDiscover
 class HubotTestSuite extends SpecBase {

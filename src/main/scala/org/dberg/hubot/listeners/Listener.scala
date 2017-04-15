@@ -9,6 +9,8 @@ import org.dberg.hubot.listeners.ListenerType.ListenerValue
 import org.dberg.hubot.models.Message
 import org.dberg.hubot.utils.Helpers._
 import scodec.codecs.ImplicitCodecs
+
+import scala.annotation.tailrec
 import scala.util.control.NonFatal
 
 object Listener {
@@ -31,6 +33,7 @@ abstract class Listener(
   val brain = hubot.brainService
   val event = hubot.eventService
 
+  @tailrec
   private def buildGroups(matcher: Matcher, count: Int, results: List[String] = List()): List[String] = count match {
     case 0 => results.reverse
     case _ => buildGroups(matcher, count - 1, results :+ matcher.group(count))
@@ -55,7 +58,6 @@ abstract class Listener(
       }
 
     } else {
-      logger.debug("Sorry, listeners says we should not respond")
       CallbackSkipped
     }
   }
