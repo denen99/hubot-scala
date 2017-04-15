@@ -3,14 +3,28 @@ package org.dberg.hubot.listeners
 import java.util.regex.{ Matcher, Pattern }
 
 import com.typesafe.scalalogging.StrictLogging
-import org.dberg.hubot.Hubot
+import org.dberg.hubot.listeners.Listener._
+import org.dberg.hubot.{ Hubot, HubotBase }
 import org.dberg.hubot.listeners.ListenerType.ListenerValue
 import org.dberg.hubot.models.Message
 import org.dberg.hubot.utils.Helpers._
 import scodec.codecs.ImplicitCodecs
 
+import scala.annotation.tailrec
+import scala.util.control.NonFatal
+
+object Listener {
+
+  sealed trait CallbackResult
+  case object CallbackSuccess extends CallbackResult //Callback worked
+  case class CallbackFailure(reason: Throwable) extends CallbackResult //Callback threw a failure
+  case object CallbackSkipped extends CallbackResult //Message not intended for robot
+  case object CallbackNotMatched extends CallbackResult //Message is for robot, but no listener matches
+  case object CallbackMiddlewareFailure extends CallbackResult //Callback not invoked due to middleware failure
+}
+
 abstract class Listener(
-    val hubot: Hubot,
+    val hubot: HubotBase,
     matcher: String,
     listenerType: ListenerValue = ListenerType.Respond
 ) extends StrictLogging with ImplicitCodecs {
@@ -19,32 +33,41 @@ abstract class Listener(
   val brain = hubot.brainService
   val event = hubot.eventService
 
-  def buildGroups(matcher: Matcher, count: Int, results: Seq[String] = Seq()): Seq[String] = count match {
+  @tailrec
+  private def buildGroups(matcher: Matcher, count: Int, results: List[String] = List()): List[String] = count match {
     case 0 => results.reverse
-    case x => buildGroups(matcher, count - 1, results :+ matcher.group(count))
+    case _ => buildGroups(matcher, count - 1, results :+ matcher.group(count))
   }
 
-  def call(message: Message): Unit = {
+  def call(message: Message): CallbackResult = {
     if (shouldRespond(message)) {
       val matcher = pattern.matcher(message.body.removeBotString(robot.hubotName))
-      matcher.find() match {
-        case false => logger.debug("no match for listener " + this.getClass.getName)
-        case true =>
-          val groups = buildGroups(matcher, matcher.groupCount())
+
+      if (matcher.find()) {
+        val groups = buildGroups(matcher, matcher.groupCount())
+        try {
           runCallback(message.copy(
             body = message.body.removeBotString(robot.hubotName)
           ), groups)
+        } catch {
+          case NonFatal(e) => CallbackFailure(e)
+        }
+      } else {
+        logger.debug("no match for listener " + this.getClass.getName)
+        CallbackNotMatched
       }
+
     } else {
-      logger.debug("Sorry, listeners says we should not respond")
+      CallbackSkipped
     }
   }
 
-  def shouldRespond(message: Message): Boolean = {
-    listenerType == ListenerType.Hear || (listenerType == ListenerType.Respond && message.body.addressedToHubot(message, robot.hubotName))
+  private def shouldRespond(message: Message): Boolean = {
+    listenerType == ListenerType.Hear ||
+      (listenerType == ListenerType.Respond && message.body.addressedToHubot(message, robot.hubotName))
   }
 
-  def runCallback(message: Message, groups: Seq[String]): Unit
+  def runCallback(message: Message, groups: List[String]): CallbackResult
 
   def helpString: Option[String]
 }

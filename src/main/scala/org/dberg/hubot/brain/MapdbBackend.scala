@@ -16,6 +16,9 @@ object MapdbBackend extends BrainBackendBase with StrictLogging {
   private val dbHash = db.hashMap("hubot", Serializer.STRING, Serializer.BYTE_ARRAY).createOrOpen()
   logger.debug("Done with MapDB Setup")
 
+  def deleteAll() =
+    dbHash.getKeys.toArray.toList.foreach(key => dbHash.remove(key))
+
   def setKey[A: SCodec](key: String, value: A) =
     dbHash.put(key, encode(value).getOrElse(Array()))
 
@@ -25,6 +28,7 @@ object MapdbBackend extends BrainBackendBase with StrictLogging {
   }
 
   def shutdown() = {
+    logger.info("Shutting down MapDB")
     dbHash.close()
     db.close()
   }

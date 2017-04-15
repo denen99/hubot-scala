@@ -1,13 +1,14 @@
 package org.dberg.hubot.listeners
 
 import org.dberg.hubot.Hubot
+import org.dberg.hubot.listeners.Listener.CallbackSuccess
 import org.dberg.hubot.models.Message
 
 class HelpListener(hubot: Hubot) extends Listener(hubot, "^help\\s*(.*)") {
 
   lazy val helpCommands = hubot.listeners.flatMap(l => l.helpString)
 
-  def runCallback(message: Message, groups: Seq[String]) = {
+  def runCallback(message: Message, groups: List[String]) = {
     logger.debug("Running help listener")
 
     lazy val commands = if (groups.nonEmpty)
@@ -16,6 +17,7 @@ class HelpListener(hubot: Hubot) extends Listener(hubot, "^help\\s*(.*)") {
       helpCommands
 
     robot.send(Message(message.user, "Help commands \n" + commands.mkString("\n"), message.messageType))
+    CallbackSuccess
   }
 
   val helpString = Some("help -> list all available commands ")
