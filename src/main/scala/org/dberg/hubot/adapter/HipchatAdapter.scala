@@ -188,6 +188,7 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
       }
       while (conn.isAuthenticated) {
         // do nothing
+        Thread.sleep(10000)
       }
       logger.error("Error - disconnected from server, reconnecting")
       run()
