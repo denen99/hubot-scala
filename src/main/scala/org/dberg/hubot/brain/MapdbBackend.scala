@@ -12,7 +12,7 @@ object MapdbBackend extends BrainBackendBase with StrictLogging {
 
   logger.debug("About to Create MapDB setup")
   private val dbFile = getConfString("hubot.brainFile", "/tmp/brain.db")
-  private val db = DBMaker.fileDB(dbFile).make()
+  private val db = DBMaker.fileDB(dbFile).closeOnJvmShutdown().make()
   private val dbHash = db.hashMap("hubot", Serializer.STRING, Serializer.BYTE_ARRAY).createOrOpen()
   logger.debug("Done with MapDB Setup")
 
