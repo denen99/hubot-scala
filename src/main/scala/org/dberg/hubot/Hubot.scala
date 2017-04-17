@@ -23,18 +23,18 @@ trait HubotBase extends RobotComponent with BrainComponent with EventComponent {
 
 class Hubot extends HubotBase with StrictLogging {
 
-  logger.debug("Creating Robot Service")
+  logger.info("Creating Robot Service")
   val robotService = new RobotService
 
-  logger.debug("Creating Brain Service")
+  logger.info("Creating Brain Service")
   val brainService = new BrainService
 
-  logger.debug("Creating Event Service")
+  logger.info("Creating Event Service")
   val eventService = new EventService
 
   val listeners: Seq[Listener] = {
     ("org.dberg.hubot.listeners.HelpListener" +: getConfStringList("hubot.listeners")).map({ l =>
-      logger.debug("Registering listener " + l)
+      logger.info("Registering listener " + l)
       val c = Class.forName(l).getConstructor(this.getClass)
       c.newInstance(this).asInstanceOf[Listener]
     }).distinct

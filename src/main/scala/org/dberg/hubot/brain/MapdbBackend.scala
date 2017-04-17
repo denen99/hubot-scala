@@ -10,11 +10,11 @@ import scala.util.Try
 
 object MapdbBackend extends BrainBackendBase with StrictLogging {
 
-  logger.debug("About to Create MapDB setup")
+  logger.info("About to setup MapDB")
   private val dbFile = getConfString("hubot.brainFile", "/tmp/brain.db")
   private val db = DBMaker.fileDB(dbFile).closeOnJvmShutdown().make()
   private val dbHash = db.hashMap("hubot", Serializer.STRING, Serializer.BYTE_ARRAY).createOrOpen()
-  logger.debug("Done with MapDB Setup")
+  logger.info("Done with MapDB Setup")
 
   def deleteAll() =
     dbHash.getKeys.toArray.toList.foreach(key => dbHash.remove(key))

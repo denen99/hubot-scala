@@ -162,11 +162,11 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
     logger.debug("Starting HipChat Run loop")
     conn.addConnectionListener(connectListener)
     if (!conn.isConnected) {
-      logger.debug("XMPP connection is connnected")
+      logger.info("XMPP connection is connnected")
       conn.connect()
     }
     if (!conn.isAuthenticated) {
-      logger.debug("XMPP connection is not authenticated, logging in")
+      logger.info("XMPP connection is not authenticated, logging in")
       conn.login()
     }
     if (conn.isAuthenticated) {
