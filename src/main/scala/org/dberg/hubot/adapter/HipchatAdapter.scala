@@ -62,31 +62,31 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
      */
     class ConnectListener(conn: XMPPTCPConnection)(onClose: () => Unit) extends ConnectionListener {
       def connected(connection: XMPPConnection) =
-        logger.debug("Received connection from user : " + connection.getUser)
+        logger.info("Received connection from user : " + connection.getUser)
 
       def reconnectionFailed(e: Exception) =
         logger.error("Connection failed : ", e)
 
       def reconnectionSuccessful =
-        logger.debug("Reconnection successful")
+        logger.info("Reconnection successful")
 
       def authenticated(connection: XMPPConnection, resumed: Boolean) =
         logger.info("Authenticated Successful")
 
       def connectionClosedOnError(e: Exception) = {
-        logger.info("Connection closed with error, attempting to re-connect", e)
+        logger.error("Connection closed with error, attempting to re-connect", e)
         conn.removeConnectionListener(this)
         conn.disconnect()
         onClose()
       }
 
       def connectionClosed = {
-        logger.debug("Error, connection closed")
+        logger.error("Error, connection closed")
         onClose()
       }
 
       def reconnectingIn(seconds: Int) =
-        logger.debug("Reconnecting in " + seconds.toString + " seconds")
+        logger.info("Reconnecting in " + seconds.toString + " seconds")
     }
 
     /**
@@ -96,7 +96,7 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
      */
     class PingMgrListener extends PingFailedListener {
       def pingFailed() =
-        logger.debug("XMPP Ping Failed")
+        logger.error("XMPP Ping Failed")
     }
 
     /**
@@ -190,11 +190,12 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
       }
       while (conn.isAuthenticated) {
         // do nothing
-        Thread.sleep(10000)
+        Thread.sleep(5000)
       }
+      conn.disconnect()
       logger.error("Error - disconnected from server, reconnecting")
       run()
-    } else { logger.error("XMPP COnnection is not authenticated") }
+    } else { logger.error("XMPP Connection is not authenticated") }
   }
 
   def send(message: HubotMessage) = {
