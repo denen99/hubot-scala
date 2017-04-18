@@ -235,6 +235,7 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
 
   val reconnectMgr = ReconnectionManager.getInstanceFor(conn)
   reconnectMgr.enableAutomaticReconnection()
+  reconnectMgr.setReconnectionPolicy(ReconnectionManager.ReconnectionPolicy.RANDOM_INCREASING_DELAY)
 
   val pingMgr = PingManager.getInstanceFor(conn)
   pingMgr.setPingInterval(10)
