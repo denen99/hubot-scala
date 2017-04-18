@@ -159,10 +159,12 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
   import HipchatAdapterTools._
 
   def run() = {
-    logger.debug("Starting HipChat Run loop")
+    logger.info("Starting HipChat Run loop")
+
     conn.addConnectionListener(connectListener)
+
     if (!conn.isConnected) {
-      logger.info("XMPP connection is connnected")
+      logger.info("XMPP connection is connected")
       conn.connect()
     }
     if (!conn.isAuthenticated) {
@@ -224,10 +226,12 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
     .setDebuggerEnabled(false)
     .setHostnameVerifier(verify)
     .setUsernameAndPassword(jid, password)
-    .setSecurityMode(ConnectionConfiguration.SecurityMode.required)
-    .setConnectTimeout(30000)
+    .setSecurityMode(ConnectionConfiguration.SecurityMode.ifpossible)
+    .setConnectTimeout(60000)
 
   val conn = new XMPPTCPConnection(conf.build())
+
+  conn.setPacketReplyTimeout(60000)
 
   val reconnectMgr = ReconnectionManager.getInstanceFor(conn)
   reconnectMgr.enableAutomaticReconnection()
