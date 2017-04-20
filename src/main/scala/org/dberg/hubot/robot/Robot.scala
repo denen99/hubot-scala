@@ -38,7 +38,7 @@ trait RobotComponent {
 
     def processListeners(message: Message): Seq[CallbackResult] = {
       listeners.map { l =>
-        logger.debug("Processing message through listener " + l.toString)
+        logger.debug(s"Processing message ${message} through listener " + l.toString)
         try {
           l.call(message)
         } catch {

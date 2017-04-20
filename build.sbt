@@ -28,8 +28,6 @@ lazy val root = (project in file(".")).
 
 fork in Test := true // allow to apply extra setting to Test
 
-javaOptions in Test += "-Dconfig.resource=application.test.conf"
-
 organization := "org.dberg"
 
 //sonatypeProfileName := "org.dberg"

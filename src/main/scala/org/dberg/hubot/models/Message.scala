@@ -20,3 +20,9 @@ final case class Message(
   params: Map[String, String] = Map(),
   done: Boolean = false
 ) extends MessageBase(user, body, messageType)
+
+object Body {
+  def unapply(message: Message): Option[String] =
+    Some(message.body)
+}
+
