@@ -177,21 +177,27 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
 
       mucMgr.getHostedRooms("conf.hipchat.com").asScala.foreach { room =>
         val muc = mucMgr.getMultiUserChat(room.getJid)
-        muc.addMessageListener(new MessageMgrListener)
-        val history = new DiscussionHistory()
-        history.setMaxStanzas(0)
-        logger.debug("Joining MUC room " + muc.getRoom() + " : " + muc.getNickname)
-        try {
-          muc.join(chatAlias, null, history, SmackConfiguration.getDefaultPacketReplyTimeout)
-        } catch {
-          case e: Exception =>
-            logger.error("Unable to join MUC room " + muc.getRoom + ": ", e)
+        if (muc.isJoined) {
+          logger.info("Skipping joined room " + muc.getRoom)
+        }
+        else {
+          muc.addMessageListener(new MessageMgrListener)
+          val history = new DiscussionHistory()
+          history.setMaxStanzas(0)
+          logger.debug("Joining MUC room " + muc.getRoom() + " : " + muc.getNickname)
+          try {
+            muc.join(chatAlias, null, history, SmackConfiguration.getDefaultPacketReplyTimeout)
+          } catch {
+            case e: Exception =>
+              logger.error("Unable to join MUC room " + muc.getRoom + ": ", e)
+          }
         }
       }
       while (conn.isAuthenticated) {
         // do nothing
         Thread.sleep(5000)
       }
+
       conn.disconnect()
       logger.error("Error - disconnected from server, reconnecting")
       run()
