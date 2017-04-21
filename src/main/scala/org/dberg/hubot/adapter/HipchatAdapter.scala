@@ -1,20 +1,20 @@
 package org.dberg.hubot.adapter
 
 import java.util.regex.Pattern
-import javax.net.ssl.{HostnameVerifier, SSLSession}
+import javax.net.ssl.{ HostnameVerifier, SSLSession }
 
 import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.Hubot
 
 import collection.JavaConverters._
 import org.jivesoftware.smack._
-import org.jivesoftware.smack.chat.{Chat, ChatManager, ChatManagerListener, ChatMessageListener}
+import org.jivesoftware.smack.chat.{ Chat, ChatManager, ChatManagerListener, ChatMessageListener }
 import org.jivesoftware.smackx.muc._
-import org.jivesoftware.smack.tcp.{XMPPTCPConnection, XMPPTCPConnectionConfiguration}
-import org.dberg.hubot.models.{MessageType, User, Message => HubotMessage}
+import org.jivesoftware.smack.tcp.{ XMPPTCPConnection, XMPPTCPConnectionConfiguration }
+import org.dberg.hubot.models.{ MessageType, User, Message => HubotMessage }
 import org.dberg.hubot.utils.Helpers._
-import org.jivesoftware.smack.packet.{Presence, Stanza, Message => SmackMessage}
-import org.jivesoftware.smackx.ping.{PingFailedListener, PingManager}
+import org.jivesoftware.smack.packet.{ Presence, Stanza, Message => SmackMessage }
+import org.jivesoftware.smackx.ping.{ PingFailedListener, PingManager }
 
 import scala.util.control.NonFatal
 
@@ -170,7 +170,7 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
       val m = mucMgr.getMultiUserChat(room)
       try {
         m.leave()
-      } catch { case NonFatal(e) => logger.error("Error leaving room, " + e.getMessage)}
+      } catch { case NonFatal(e) => logger.error("Error leaving room, " + e.getMessage) }
     }
   }
 
@@ -179,7 +179,6 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
 
     conn.addConnectionListener(connectListener)
     mucMgr.addInvitationListener(mucListener)
-
 
     if (!conn.isConnected) {
       logger.info("XMPP connection is connected")
@@ -218,16 +217,17 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
           // do nothing
           Thread.sleep(5000)
         }
-      } catch { case NonFatal(e) =>
-        logger.error("Hipchat RunLoop failed, restarting: " + e.getMessage)
-        run()
+      } catch {
+        case NonFatal(e) =>
+          logger.error("Hipchat RunLoop failed, restarting: " + e.getMessage)
+          run()
       }
 
       //TODO: review this
       // lets rely on listeners for now
-//      conn.disconnect()
-//      logger.error("Error - disconnected from server, reconnecting")
-//      run()
+      //      conn.disconnect()
+      //      logger.error("Error - disconnected from server, reconnecting")
+      //      run()
     } else { logger.error("XMPP Connection is not authenticated") }
 
     logger.error("We exited the HipChat Adapter run loop....")
