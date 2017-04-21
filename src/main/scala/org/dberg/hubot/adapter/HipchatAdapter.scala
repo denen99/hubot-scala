@@ -1,20 +1,22 @@
 package org.dberg.hubot.adapter
 
 import java.util.regex.Pattern
-import javax.net.ssl.{ HostnameVerifier, SSLSession }
+import javax.net.ssl.{HostnameVerifier, SSLSession}
 
 import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.Hubot
 
 import collection.JavaConverters._
 import org.jivesoftware.smack._
-import org.jivesoftware.smack.chat.{ Chat, ChatManager, ChatManagerListener, ChatMessageListener }
+import org.jivesoftware.smack.chat.{Chat, ChatManager, ChatManagerListener, ChatMessageListener}
 import org.jivesoftware.smackx.muc._
-import org.jivesoftware.smack.tcp.{ XMPPTCPConnection, XMPPTCPConnectionConfiguration }
-import org.dberg.hubot.models.{ MessageType, User, Message => HubotMessage }
+import org.jivesoftware.smack.tcp.{XMPPTCPConnection, XMPPTCPConnectionConfiguration}
+import org.dberg.hubot.models.{MessageType, User, Message => HubotMessage}
 import org.dberg.hubot.utils.Helpers._
-import org.jivesoftware.smack.packet.{ Presence, Stanza, Message => SmackMessage }
-import org.jivesoftware.smackx.ping.{ PingFailedListener, PingManager }
+import org.jivesoftware.smack.packet.{Presence, Stanza, Message => SmackMessage}
+import org.jivesoftware.smackx.ping.{PingFailedListener, PingManager}
+
+import scala.util.control.NonFatal
 
 class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with StrictLogging {
 
@@ -76,12 +78,16 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
       def connectionClosedOnError(e: Exception) = {
         logger.error("Connection closed with error, attempting to re-connect", e)
         conn.removeConnectionListener(this)
+        mucMgr.removeInvitationListener(mucListener)
         conn.disconnect()
         onClose()
       }
 
       def connectionClosed = {
         logger.error("Error, connection closed")
+        conn.removeConnectionListener(this)
+        mucMgr.removeInvitationListener(mucListener)
+        conn.disconnect()
         onClose()
       }
 
@@ -158,10 +164,22 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
 
   import HipchatAdapterTools._
 
+  private def leaveJoinedRooms() = {
+    mucMgr.getJoinedRooms.asScala.foreach { room =>
+      logger.info("Forcing leave of room " + room)
+      val m = mucMgr.getMultiUserChat(room)
+      try {
+        m.leave()
+      } catch { case NonFatal(e) => logger.error("Error leaving room, " + e.getMessage)}
+    }
+  }
+
   def run() = {
     logger.info("Starting HipChat Run loop")
 
     conn.addConnectionListener(connectListener)
+    mucMgr.addInvitationListener(mucListener)
+
 
     if (!conn.isConnected) {
       logger.info("XMPP connection is connected")
@@ -175,33 +193,44 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
 
       pingMgr.pingMyServer(true) // Just a test
 
+      leaveJoinedRooms() // First leave the rooms
+
       mucMgr.getHostedRooms("conf.hipchat.com").asScala.foreach { room =>
         val muc = mucMgr.getMultiUserChat(room.getJid)
         if (muc.isJoined) {
           logger.info("Skipping joined room " + muc.getRoom)
-        }
-        else {
-          muc.addMessageListener(new MessageMgrListener)
+        } else {
           val history = new DiscussionHistory()
           history.setMaxStanzas(0)
-          logger.debug("Joining MUC room " + muc.getRoom() + " : " + muc.getNickname)
+          logger.info("Joining MUC room " + muc.getRoom() + " : " + muc.getNickname)
           try {
             muc.join(chatAlias, null, history, SmackConfiguration.getDefaultPacketReplyTimeout)
+            muc.addMessageListener(new MessageMgrListener)
           } catch {
             case e: Exception =>
               logger.error("Unable to join MUC room " + muc.getRoom + ": ", e)
           }
         }
       }
-      while (conn.isAuthenticated) {
-        // do nothing
-        Thread.sleep(5000)
+
+      try {
+        while (conn.isAuthenticated) {
+          // do nothing
+          Thread.sleep(5000)
+        }
+      } catch { case NonFatal(e) =>
+        logger.error("Hipchat RunLoop failed, restarting: " + e.getMessage)
+        run()
       }
 
-      conn.disconnect()
-      logger.error("Error - disconnected from server, reconnecting")
-      run()
+      //TODO: review this
+      // lets rely on listeners for now
+//      conn.disconnect()
+//      logger.error("Error - disconnected from server, reconnecting")
+//      run()
     } else { logger.error("XMPP Connection is not authenticated") }
+
+    logger.error("We exited the HipChat Adapter run loop....")
   }
 
   def send(message: HubotMessage) = {
@@ -252,7 +281,7 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
   chatMgr.addChatListener(new ChatMgrListener)
 
   val mucMgr = MultiUserChatManager.getInstanceFor(conn)
-  mucMgr.addInvitationListener(new MucInvitationListener)
+  val mucListener = new MucInvitationListener
 
   val connectListener = new ConnectListener(conn)(run)
 
