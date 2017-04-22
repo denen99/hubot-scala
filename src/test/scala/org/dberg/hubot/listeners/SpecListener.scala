@@ -1,26 +1,24 @@
 package org.dberg.hubot.listeners
 
 import org.dberg.hubot.HubotBase
-import org.dberg.hubot.models.Message
+import org.dberg.hubot.models._
 import org.dberg.hubot.SpecHelpers._
-import org.dberg.hubot.listeners.Listener.{ CallbackFailure, CallbackSuccess }
 
-class SpecListener(hubot: HubotBase) extends Listener(hubot, "spectest\\s*(.*)") {
+class SpecListener(hubot: HubotBase) extends Listener(hubot) {
 
   val helpString = Some("this is a spec helper")
 
-  override def runCallback(message: Message, groups: List[String]) = {
-    logger.debug("running spec listener callback")
-    val resp = generateListenerResponse(message, groups.head)
+  val callback: Callback = {
+    case message @ Body(r"spectest\s*(.*)$phrase\s*$$") =>
+      logger.debug("running spec listener callback")
+      val resp = generateListenerResponse(message, phrase)
 
-    //Bogus data to simulate a failure
-    if (message.body.contains("failure")) {
-      CallbackFailure(exception)
-    } else {
-      hubot.brainService.set[String]("lastmessage", resp.body)
-      hubot.adapter.send(resp)
-      CallbackSuccess
-    }
-
+      //Bogus data to simulate a failure
+      if (message.body.contains("failure")) {
+        throw exception
+      } else {
+        hubot.brainService.set[String]("lastmessage", resp.body)
+        hubot.adapter.send(resp)
+      }
   }
 }

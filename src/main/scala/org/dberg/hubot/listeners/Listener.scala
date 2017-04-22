@@ -1,7 +1,6 @@
 package org.dberg.hubot.listeners
 
-import java.util.regex.{ Matcher, Pattern }
-
+import util.matching.Regex
 import com.typesafe.scalalogging.StrictLogging
 import org.dberg.hubot.listeners.Listener._
 import org.dberg.hubot.{ Hubot, HubotBase }
@@ -25,30 +24,30 @@ object Listener {
 
 abstract class Listener(
     val hubot: HubotBase,
-    matcher: String,
     listenerType: ListenerValue = ListenerType.Respond
 ) extends StrictLogging with ImplicitCodecs {
-  val pattern = Pattern.compile(matcher)
+
+  type Callback = PartialFunction[Message, Unit]
+
+  implicit class RegexContext(sc: StringContext) {
+    def r = new Regex(sc.parts.mkString, sc.parts.tail.map(_ => "x"): _*)
+  }
+
+  def callback: Callback
+
   val robot = hubot.robotService
   val brain = hubot.brainService
   val event = hubot.eventService
 
-  @tailrec
-  private def buildGroups(matcher: Matcher, count: Int, results: List[String] = List()): List[String] = count match {
-    case 0 => results.reverse
-    case _ => buildGroups(matcher, count - 1, results :+ matcher.group(count))
-  }
-
   def call(message: Message): CallbackResult = {
     if (shouldRespond(message)) {
-      val matcher = pattern.matcher(message.body.removeBotString(robot.hubotName))
-
-      if (matcher.find()) {
-        val groups = buildGroups(matcher, matcher.groupCount())
+      val updated = message.copy(
+        body = message.body.removeBotString(robot.hubotName)
+      )
+      if (callback.isDefinedAt(updated)) {
         try {
-          runCallback(message.copy(
-            body = message.body.removeBotString(robot.hubotName)
-          ), groups)
+          callback(updated)
+          CallbackSuccess
         } catch {
           case NonFatal(e) => CallbackFailure(e)
         }
@@ -66,8 +65,6 @@ abstract class Listener(
     listenerType == ListenerType.Hear ||
       (listenerType == ListenerType.Respond && message.body.addressedToHubot(message, robot.hubotName))
   }
-
-  def runCallback(message: Message, groups: List[String]): CallbackResult
 
   def helpString: Option[String]
 }

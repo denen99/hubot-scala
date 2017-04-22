@@ -1,7 +1,7 @@
 lazy val root = (project in file(".")).
   settings(
     name := "hubot-scala",
-    version := "0.2.9",
+    version := "0.3.0",
     scalaVersion := "2.11.8",
     retrieveManaged := true,
     libraryDependencies ++= Seq(
@@ -27,8 +27,6 @@ lazy val root = (project in file(".")).
 )
 
 fork in Test := true // allow to apply extra setting to Test
-
-javaOptions in Test += "-Dconfig.resource=application.test.conf"
 
 organization := "org.dberg"
 
