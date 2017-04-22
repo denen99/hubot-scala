@@ -26,8 +26,16 @@ lazy val root = (project in file(".")).
       "org.scodec" %% "scodec-bits" % "1.0.11",
       "org.scalatest" %% "scalatest" % "3.0.3" % Test,
       "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test
-    )
+    ),
+    addCommandAlias("validate", Seq(
+      "clean",
+      "coverage",
+      "test",
+      "coverageReport",
+      "coverageAggregate"
+    ).mkString(";", ";", ""))
 )
+
 
 fork in Test := true // allow to apply extra setting to Test
 
