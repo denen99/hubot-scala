@@ -17,7 +17,7 @@ class ShellAdapter(hubot: Hubot) extends BaseAdapter(hubot) {
         .map(_.trim)
         .filter(_.nonEmpty)
         .foreach { resp =>
-          robot.receive(Message(User("adam"), resp, MessageType.GroupMessage))
+          robot.receive(Message(User("adam"), resp, MessageType.Group))
         }
     }
   }

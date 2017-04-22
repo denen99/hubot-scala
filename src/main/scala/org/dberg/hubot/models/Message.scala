@@ -3,8 +3,18 @@ package org.dberg.hubot.models
 sealed trait MessageType
 
 object MessageType {
-  case object DirectMessage extends MessageType
-  case object GroupMessage extends MessageType
+  case object Direct extends MessageType {
+    def unapply(message: Message) = message.messageType match {
+      case Direct => true
+      case _ => false
+    }
+  }
+  case object Group extends MessageType {
+    def unapply(message: Message) = message.messageType match {
+      case Group => true
+      case _ => false
+    }
+  }
 }
 
 abstract class MessageBase(user: User, body: String, messageType: MessageType, params: Map[String, String] = Map()) {
@@ -32,22 +42,6 @@ object & {
 object SentBy {
   def unapply(message: Message): Option[User] =
     Some(message.user)
-}
-
-object Direct {
-  def unapply(message: Message): Boolean =
-    message.messageType match {
-      case MessageType.DirectMessage => true
-      case _ => false
-    }
-}
-
-object Group {
-  def unapply(message: Message): Boolean =
-    message.messageType match {
-      case MessageType.GroupMessage => true
-      case _ => false
-    }
 }
 
 object Room {

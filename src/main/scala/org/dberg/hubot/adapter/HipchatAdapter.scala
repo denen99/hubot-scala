@@ -52,7 +52,7 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
         if (msg.getBody != null) {
           val jid = getJid(msg.getFrom)
           val user = User(jid)
-          robot.receive(HubotMessage(user, msg.getBody, MessageType.DirectMessage))
+          robot.receive(HubotMessage(user, msg.getBody, MessageType.Direct))
         }
       }
     }
@@ -133,7 +133,7 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
           //Dont process messages if the bot sent them to avoid loops !
           //TODO:  This should be made generic for any adapter or future adapters are screwed !
           if (getPresence(message.getFrom) != chatAlias)
-            robot.receive(HubotMessage(user, message.getBody, MessageType.GroupMessage))
+            robot.receive(HubotMessage(user, message.getBody, MessageType.Group))
         }
       }
 
@@ -236,10 +236,10 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
   def send(message: HubotMessage) = {
     logger.debug("Hipchat Adapter sending message : " + message.toString)
     message.messageType match {
-      case MessageType.DirectMessage =>
+      case MessageType.Direct =>
         val chat = chatMgr.createChat(message.user.room, new ChatListener)
         chat.sendMessage(message.body)
-      case MessageType.GroupMessage =>
+      case MessageType.Group =>
         logger.debug("Sending message back to MUC " + message.user.room)
         val muc = mucMgr.getMultiUserChat(message.user.room)
         muc.sendMessage(message.body)
