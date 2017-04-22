@@ -1,14 +1,13 @@
 package org.dberg.hubot.models
 
-import org.dberg.hubot.models.MessageType.MessageTypeValue
+sealed trait MessageType
 
 object MessageType {
-  sealed trait MessageTypeValue
-  case object DirectMessage extends MessageTypeValue
-  case object GroupMessage extends MessageTypeValue
+  case object DirectMessage extends MessageType
+  case object GroupMessage extends MessageType
 }
 
-abstract class MessageBase(user: User, body: String, messageType: MessageTypeValue, params: Map[String, String] = Map()) {
+abstract class MessageBase(user: User, body: String, messageType: MessageType, params: Map[String, String] = Map()) {
   val room = user.room
 
 }
@@ -16,7 +15,7 @@ abstract class MessageBase(user: User, body: String, messageType: MessageTypeVal
 final case class Message(
   user: User,
   body: String,
-  messageType: MessageTypeValue,
+  messageType: MessageType,
   params: Map[String, String] = Map(),
   done: Boolean = false
 ) extends MessageBase(user, body, messageType)
@@ -24,5 +23,35 @@ final case class Message(
 object Body {
   def unapply(message: Message): Option[String] =
     Some(message.body)
+}
+
+object & {
+  def unapply[A](value: A): Option[(A, A)] = Some(value, value)
+}
+
+object SentBy {
+  def unapply(message: Message): Option[User] =
+    Some(message.user)
+}
+
+object Direct {
+  def unapply(message: Message): Boolean =
+    message.messageType match {
+      case MessageType.DirectMessage => true
+      case _ => false
+    }
+}
+
+object Group {
+  def unapply(message: Message): Boolean =
+    message.messageType match {
+      case MessageType.GroupMessage => true
+      case _ => false
+    }
+}
+
+object Room {
+  def unapply(message: Message): Option[String] =
+    Some(message.user.room)
 }
 
