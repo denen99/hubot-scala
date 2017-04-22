@@ -7,7 +7,7 @@ import org.dberg.hubot.models._
 class TestListener2(hubot: Hubot) extends Listener(hubot) {
 
   val callback: Callback = {
-    case message @ Body(r"listen2") =>
+    case message @ Body("listen2") =>
       logger.debug("Running callback for listener TestListener2")
       robot.send(Message(message.user, message.body.reverse, message.messageType))
   }
