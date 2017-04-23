@@ -34,3 +34,4 @@ target
 
 src/main/resources/*.conf
 testfile
+.DS_Store

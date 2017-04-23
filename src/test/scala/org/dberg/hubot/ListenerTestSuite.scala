@@ -3,19 +3,19 @@ package org.dberg.hubot
 import org.dberg.hubot.SpecHelpers._
 import org.dberg.hubot.listeners.Listener._
 import org.dberg.hubot.models.{ Message, User }
-import org.dberg.hubot.models.MessageType.{ DirectMessage, GroupMessage }
+import org.dberg.hubot.models.MessageType.{ Direct, Group }
 import org.scalatest.DoNotDiscover
 
 @DoNotDiscover
 class ListenerTestSuite extends SpecBase {
 
-  val matchedMessage1 = Message(User("specuser"), "spectest", DirectMessage)
-  val matchedMessage2 = Message(User("specuser"), "spectest param1", DirectMessage)
-  val blacklistMessage = Message(User("specuser"), "spectest blacklist", DirectMessage)
-  val unMatchedDirectMessage = Message(User("specuser"), "nothing matches", DirectMessage)
-  val unMatchedGroupMessage = Message(User("specuser"), hubot.robotService.hubotName + " nothing matches", GroupMessage)
-  val skippableGroupMessage = Message(User("specuser"), "nothing matches", GroupMessage)
-  val failureMessage = Message(User("specuser"), "spectest failure", DirectMessage)
+  val matchedMessage1 = Message(User("specuser"), "spectest", Direct)
+  val matchedMessage2 = Message(User("specuser"), "spectest param1", Direct)
+  val blacklistMessage = Message(User("specuser"), "spectest blacklist", Direct)
+  val unMatchedDirectMessage = Message(User("specuser"), "nothing matches", Direct)
+  val unMatchedGroupMessage = Message(User("specuser"), hubot.robotService.hubotName + " nothing matches", Group)
+  val skippableGroupMessage = Message(User("specuser"), "nothing matches", Group)
+  val failureMessage = Message(User("specuser"), "spectest failure", Direct)
 
   "A listener" should "receive the matched regex groups" in {
     val param = "param1"
@@ -35,7 +35,7 @@ class ListenerTestSuite extends SpecBase {
   }
 
   it should "respond if its a GroupMessage and addressed to hubot" in {
-    val message = matchedMessage1.copy(body = hubot.robotService.hubotName + " " + matchedMessage1.body, messageType = GroupMessage)
+    val message = matchedMessage1.copy(body = hubot.robotService.hubotName + " " + matchedMessage1.body, messageType = Group)
     val param = ""
     val resp = generateListenerResponse(message, param)
     (hubot.adapter.send _).expects(resp)

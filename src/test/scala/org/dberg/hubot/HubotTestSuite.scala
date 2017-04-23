@@ -12,7 +12,7 @@ class HubotTestSuite extends SpecBase {
   val robot = hubot.robotService
   val brain = hubot.brainService
 
-  val matchedMessage1 = Message(User("specuser"), "spectest message test", DirectMessage)
+  val matchedMessage1 = Message(User("specuser"), "spectest message test", Direct)
 
   "Hubot" should "have a name" in {
     assert(hubot.robotService.hubotName == "specbot")
