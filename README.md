@@ -20,11 +20,15 @@ Brain, is a configurable backend that allows you to have persistence.  Currently
 
 Also note, that for serialization purposes, mostly to allow the storing of complex types as values (like List() and Map()), Scodec is used as the serialization.  The gets are also wrapped in a Try{} since a NullPointer is returned when trying to deserialize to an invalid type.  This means the syntax for getting a value from the brain would be something like:
 
-	brain.get[A](someKey).getOrElse(defaultValue)
+```scala
+brain.get[A](someKey).getOrElse(defaultValue)
+```
 	
 where A is the type you are deserializing to (String, List[Int]), someKey is the key to your hash and defaultValue is the value to return if the key is not found.  Additionally to store a value, the format would be 
 
-	brain.set[A](someKey, someValue)
+```scala
+brain.set[A](someKey, someValue)
+```
 
 Again, someValue needs to be of type A, and someKey is a String.
 
@@ -32,39 +36,43 @@ Again, someValue needs to be of type A, and someKey is a String.
 
 To get started, first, you need to put the hubot-scala library in your build.sbt as follows
 
-        libraryDependencies += "org.dberg" % "hubot-scala_2.11" % "${latest}"
+```scala
+libraryDependencies += "org.dberg" % "hubot-scala_2.11" % "${latest}"
+```
         
         
 Once you do that, in your new project create whatever classes you need.  For example, here is a simple listener, that responds to hello when the Bot is addressed
 
-    class TestListener(hubot: Hubot) extends Listener(hubot,"hello\\s+world", ListenerType.Respond) {
-
-      //TODO: Update README Here 
-      def runCallback(message: Message, groups: Seq[String]) = {
-        Logger.log("Running callback for listner TestListener","debug")
-        robot.send(Message(message.user,"Hubot says hello!"", message.messageType))
-      }
-
-      val helpString = Some("hello world -> Allows hubot to say hello !")
-    }
+```scala
+class TestListener(hubot: Hubot) extends Listener(hubot, ListenerType.Respond) {
+  val callback: Callback = {
+  case r"hello\s+world" =>
+    Logger.log("Running callback for listner TestListener","debug")
+    robot.send(Message(message.user,"Hubot says hello!"", message.messageType))
+  }
+  val helpString = Some("hello world -> Allows hubot to say hello !")
+}
+```
 
 The structure of the Message class is Message(user: User, body: String, messageType: MessageTypeValue, params: Map[String,String]).  The params allows the adapter a place to stick additional information that then gets passed through to the listener and middleware.
 
 To create a middleware is similar to the listener.  Create a new class that extends Middleware and do whatever you want with the message.  Then simply define a method named "execute(message: Message)" and you are good to go.  You can keep state, call an external service, etc.  Here is an example of middleware that checks if the message matches the word "blacklist".
 
-    class TestMiddleware(hubot: Hubot) extends Middleware(hubot) {
+```scala
+class TestMiddleware(hubot: Hubot) extends Middleware(hubot) {
 
-     def execute(message: Message) = {
-      if (message.body == "blacklist") {
-       Left(MiddlewareError("Sorry this is a blacklist"))
-      }
-      else {
-       Right(MiddlewareSuccess())
-      }
-     }
-     
-    }
-    
+ def execute(message: Message) = {
+  if (message.body == "blacklist") {
+   Left(MiddlewareError("Sorry this is a blacklist"))
+  }
+  else {
+   Right(MiddlewareSuccess())
+  }
+ }
+ 
+}
+```
+
 ### Configuration
 
 2 configuration files should be used and placed in src/main/resources.  The first is application.conf (check the sample in this repo). The format is like so 
@@ -108,11 +116,13 @@ The second is the logback.xml file.  Tweak this file depending on how you want y
 
  Once you have everything configured you simply need to start the bot.  Create a simple Main class as so 
  
-     import org.dberg.hubot.HubotRunner
- 
-     object Main {
-      def main(args: Array[String]) = {
-         HubotRunner.start
-      }
-     }
+```scala
+import org.dberg.hubot.HubotRunner
+
+object Main {
+  def main(args: Array[String]) = {
+    HubotRunner.start
+  }
+}
+```
 
