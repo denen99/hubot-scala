@@ -164,11 +164,11 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
 
   import HipchatAdapterTools._
 
-  private def leaveJoinedRooms() = {
-    mucMgr.getJoinedRooms.asScala.foreach { room =>
-      logger.info("Forcing leave of room " + room)
-      val m = mucMgr.getMultiUserChat(room)
+  private def leaveJoinedRooms(rooms: List[String]) = {
+    rooms.foreach { room =>
       try {
+        logger.info("Forcing leave of room " + room)
+        val m = mucMgr.getMultiUserChat(room)
         m.leave()
       } catch { case NonFatal(e) => logger.error("Error leaving room, " + e.getMessage) }
     }
@@ -192,7 +192,7 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
 
       pingMgr.pingMyServer(true) // Just a test
 
-      leaveJoinedRooms() // First leave the rooms
+      leaveJoinedRooms(mucMgr.getJoinedRooms.asScala.toList) // First leave the rooms
 
       mucMgr.getHostedRooms("conf.hipchat.com").asScala.foreach { room =>
         val muc = mucMgr.getMultiUserChat(room.getJid)
