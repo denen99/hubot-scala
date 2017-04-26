@@ -4,7 +4,7 @@ val smackVersion = "4.1.9"
 lazy val root = (project in file(".")).
   settings(
     name := "hubot-scala",
-    version := "0.3.1",
+    version := "0.3.2",
     scalaVersion := "2.11.11",
     retrieveManaged := true,
     libraryDependencies ++= Seq(
