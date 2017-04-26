@@ -194,7 +194,6 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
 
       leaveJoinedRooms(mucMgr.getJoinedRooms.asScala.toList) // First leave the rooms
 
-
       mucMgr.getHostedRooms("conf.hipchat.com").asScala.foreach { room =>
         val muc = mucMgr.getMultiUserChat(room.getJid)
         if (muc.isJoined) {
