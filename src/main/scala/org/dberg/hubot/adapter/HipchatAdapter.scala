@@ -166,9 +166,9 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
 
   private def leaveJoinedRooms(rooms: List[String]) = {
     rooms.foreach { room =>
-      logger.info("Forcing leave of room " + room)
-      val m = mucMgr.getMultiUserChat(room)
       try {
+        logger.info("Forcing leave of room " + room)
+        val m = mucMgr.getMultiUserChat(room)
         m.leave()
       } catch { case NonFatal(e) => logger.error("Error leaving room, " + e.getMessage) }
     }
