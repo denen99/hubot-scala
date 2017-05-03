@@ -80,7 +80,6 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
         conn.removeConnectionListener(this)
         mucMgr.removeInvitationListener(mucListener)
         conn.disconnect()
-        onClose()
       }
 
       def connectionClosed = {
@@ -88,7 +87,6 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
         conn.removeConnectionListener(this)
         mucMgr.removeInvitationListener(mucListener)
         conn.disconnect()
-        onClose()
       }
 
       def reconnectingIn(seconds: Int) =
@@ -213,14 +211,13 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
       }
 
       try {
-        while (conn.isAuthenticated) {
+        while (conn.isAuthenticated && conn.isConnected) {
           // do nothing
           Thread.sleep(5000)
         }
       } catch {
         case NonFatal(e) =>
-          logger.error("Hipchat RunLoop failed, restarting: " + e.getMessage)
-          run()
+          logger.error("Hipchat RunLoop failed, exiting: " + e.getMessage)
       }
 
       //TODO: review this
@@ -267,7 +264,7 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
 
   val conn = new XMPPTCPConnection(conf.build())
 
-  conn.setPacketReplyTimeout(60000)
+  conn.setPacketReplyTimeout(10000)
 
   val reconnectMgr = ReconnectionManager.getInstanceFor(conn)
   reconnectMgr.enableAutomaticReconnection()
