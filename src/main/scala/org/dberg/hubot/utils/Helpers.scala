@@ -40,18 +40,26 @@ object Helpers {
     case true => config.getStringList(key)
   }
 
-  def request(url: String, method: String = "GET", headers: Seq[(String, String)], data: String = ""): HttpResponse = method.toUpperCase match {
+  implicit class HttpAuth(h: HttpRequest) {
+    def withAuth(auth: Option[(String, String)]): HttpRequest = {
+      if (auth.isDefined) {
+        h.auth(auth.get._1, auth.get._2)
+      } else h
+    }
+  }
+
+  def request(url: String, method: String = "GET", headers: Seq[(String, String)], data: String = "", auth: Option[(String, String)] = None): HttpResponse = method.toUpperCase match {
     case "GET" =>
-      val req = Http(url).headers(headers)
+      val req = Http(url).withAuth(auth).headers(headers)
       HttpResponse(req.asString.code, req.asString.headers, req.asString.body)
     case "POST" =>
-      val req = Http(url).headers(headers).postData(data)
+      val req = Http(url).withAuth(auth).headers(headers).postData(data)
       HttpResponse(req.asString.code, req.asString.headers, req.asString.body)
     case "PUT" =>
-      val req = Http(url).headers(headers).put(data)
+      val req = Http(url).withAuth(auth).headers(headers).put(data)
       HttpResponse(req.asString.code, req.asString.headers, req.asString.body)
     case "DELETE" =>
-      val req = Http(url).postData(data).method("DELETE")
+      val req = Http(url).withAuth(auth).headers(headers).postData(data).method("DELETE")
       HttpResponse(req.asString.code, req.asString.headers, req.asString.body)
   }
 
