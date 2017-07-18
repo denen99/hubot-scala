@@ -266,9 +266,10 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
 
   conn.setPacketReplyTimeout(10000)
 
-  val reconnectMgr = ReconnectionManager.getInstanceFor(conn)
-  reconnectMgr.enableAutomaticReconnection()
-  reconnectMgr.setReconnectionPolicy(ReconnectionManager.ReconnectionPolicy.RANDOM_INCREASING_DELAY)
+  //We think this is making things worse.  Lets just die cleanly and let supervisor restart us ¯\_(ツ)_/¯
+  //  val reconnectMgr = ReconnectionManager.getInstanceFor(conn)
+  //  reconnectMgr.enableAutomaticReconnection()
+  //  reconnectMgr.setReconnectionPolicy(ReconnectionManager.ReconnectionPolicy.RANDOM_INCREASING_DELAY)
 
   val pingMgr = PingManager.getInstanceFor(conn)
   pingMgr.setPingInterval(10)
