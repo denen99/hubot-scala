@@ -33,5 +33,6 @@ target
 .java-version
 
 src/main/resources/*.conf
+src/main/resources/*.xml
 testfile
 .DS_Store
