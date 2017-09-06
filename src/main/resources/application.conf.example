@@ -17,5 +17,6 @@ hubot {
 hipchat {
   jid="111@chat.hipchat.com"
   password="somePass"
-  chatAlias = "ScalaBot" //cant be same as name, need to read XEP to see why 
+  chatAlias = "ScalaBot" //cant be same as name, need to read XEP to see why
+  rooms = ["somenumber_somename@conf.hipchat.com"] //whitelist of rooms, defaults to every room if not set
 }

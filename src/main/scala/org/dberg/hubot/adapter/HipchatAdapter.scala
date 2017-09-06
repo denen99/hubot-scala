@@ -172,6 +172,13 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
     }
   }
 
+  protected def intersectIfNotEmpty(x: Seq[String], y: Iterable[HostedRoom]): Iterable[HostedRoom] = {
+    if (x.isEmpty)
+      y
+    else
+      y.filter(r => x.contains(r.getJid))
+  }
+
   def run() = {
     logger.info("Starting HipChat Run loop")
 
@@ -192,7 +199,7 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
 
       leaveJoinedRooms(mucMgr.getJoinedRooms.asScala.toList) // First leave the rooms
 
-      mucMgr.getHostedRooms("conf.hipchat.com").asScala.foreach { room =>
+      intersectIfNotEmpty(rooms, mucMgr.getHostedRooms("conf.hipchat.com").asScala).foreach { room =>
         val muc = mucMgr.getMultiUserChat(room.getJid)
         if (muc.isJoined) {
           logger.info("Skipping joined room " + muc.getRoom)
@@ -247,6 +254,7 @@ class HipchatAdapter(hubot: Hubot) extends BaseAdapter(hubot: Hubot) with Strict
   val jid = getConfString("hipchat.jid", "none")
   val password = getConfString("hipchat.password", "none")
   val chatAlias = getConfString("hipchat.chatAlias", "ScalaBot")
+  val rooms = getConfStringList("hipchat.rooms")
 
   val verify = new HostnameVerifier {
     override def verify(s: String, sslSession: SSLSession): Boolean = true
